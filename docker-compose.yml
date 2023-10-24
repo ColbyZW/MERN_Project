@@ -1,0 +1,25 @@
+services:
+  react:
+    build: ./frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - node-server
+
+  node-server:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata:/data
+
+volumes:
+  dbdata:
