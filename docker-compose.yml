@@ -6,6 +6,12 @@ services:
     depends_on:
       - mongodb
       - node-server
+    volumes:
+      - ./frontend:/src
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WDS_SOCKET_PORT=0
+      - WATCHPACK_POLLING=true
 
   node-server:
     build: ./backend
