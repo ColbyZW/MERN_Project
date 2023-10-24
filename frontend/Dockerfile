@@ -5,6 +5,6 @@ COPY package.json package-lock.json /src/
 RUN npm install
 
 COPY . /src
-EXPOSE 8080
+EXPOSE 3000
 
 CMD ["npm", "start"]
