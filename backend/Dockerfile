@@ -1,10 +1,14 @@
 FROM node:18-alpine
 
-WORKDIR /src
-COPY package.json package-lock.json /src/
+WORKDIR /
+COPY package.json package-lock.json ./
 RUN npm install
+ENV PATH=/node_modules/.bin:$PATH
 
-COPY . /src
+WORKDIR /src
+
+RUN npm install -g nodemon
+
 EXPOSE 8000
 
-CMD ["node", "server.js"]
+CMD ["nodemon", "-L", "server.js"]
