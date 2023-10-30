@@ -1,50 +1,71 @@
 const express = require('express')
 const app = express()
-const postmark = require('postmark')
-const crypto = require('crypto')
+const passport = require('passport')
+const GoogleStrategy = require('passport-google-oauth2')
+const session = require('express-session')
 const port = 8000
-const postmarkApiKey = process.env.POSTMARK_API
-const postmarkEmail = process.env.POSTMARK_EMAIL
+
+const googleClientId = process.env.GOOGLE_CLIENT_ID
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
+const callbackURL = process.env.CALLBACK_URL
+
+// Setup the OAUTH middleware
+passport.use(new GoogleStrategy({
+    clientID: googleClientId,
+    clientSecret: googleClientSecret,
+    callbackURL: callbackURL,
+    passReqToCallback: true
+    },
+    function (request, accessToken, refreshToken, profile, done) {
+        // We need to use this to create a new user in the database
+        const userId = profile.id
+        const userEmail = profile.email
+        const userName = profile.displayName
+
+        // The second argument of done is the user from the database
+        return done(null, {})
+    }
+))
+
+passport.serializeUser((user, done) => {
+    done(null, user)
+})
+
+passport.deserializeUser((user, done) => {
+    done(null, user)
+})
+
 
 // Set up the express middleware
+app.use(session({
+    secret: "supersecret",
+}))
 app.use(express.json())
 app.use(express.urlencoded())
+app.use(passport.initialize())
+app.use(passport.authenticate('session'))
+
 
 app.listen(port, () => {
     console.log(`Server listening on port: ${port}`)
 })
 
-app.post("/register", async (request, response) => {
-    let postBody = request.body;
+// Initial google auth route
+app.get("/auth/google", 
+    passport.authenticate('google', {scope: ['email', 'profile']})
+)
 
-    // Generate a pseudorandom code to use for verification
-    // We'll have to store this in the user profile object as well
-    const randomCode = crypto.randomBytes(64).toString('hex').slice(0,6).toUpperCase();
+// Callback to handle OAUTH Responses
+app.get('/auth/google/callback',
+    passport.authenticate('google', {
+        successRedirect: '/auth/google/success',
+        failureRedirect: '/auth/google/failure'
+}))
 
-    const emailTemplate = `\
-    <div>\
-        <h1>Welcome to Lancelot!</h1><br/>\
-        <div>Please enter this code to verify your account on our website: ${randomCode}</div><br/>\
-    </div>\
-    `
+app.get('/auth/google/success', (req, res) => {
+    res.status(200).send("SUCCESS")
+})
 
-    let client = new postmark.ServerClient(postmarkApiKey);
-    let res = await client.sendEmail({
-        "From": postmarkEmail,
-        "To": postBody.email,
-        "Subject": "Please Verify Your Email With Lancelot",
-        "HtmlBody": emailTemplate,
-        "MessageStream": "outbound"
-    })
-
-    if (res.ErrorCode === 0 && res.Message === "OK") {
-        response.status(200).send({
-            "message": "Account created, email sent for verification.",
-        });
-    } else {
-        response.status(400).send({
-            "message": "There was an issue creating the account, please try again."
-        })
-    }
-
+app.get('/auth/google/failure', (req, res) => {
+    res.status(400).send("FAILURE")
 })
