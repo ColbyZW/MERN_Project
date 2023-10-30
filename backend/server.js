@@ -4,6 +4,7 @@ const postmark = require('postmark')
 const crypto = require('crypto')
 const port = 8000
 const postmarkApiKey = process.env.POSTMARK_API
+const postmarkEmail = process.env.POSTMARK_EMAIL
 
 // Set up the express middleware
 app.use(express.json())
@@ -29,7 +30,7 @@ app.post("/register", async (request, response) => {
 
     let client = new postmark.ServerClient(postmarkApiKey);
     let res = await client.sendEmail({
-        "From": "enter your email in here",
+        "From": postmarkEmail,
         "To": postBody.email,
         "Subject": "Please Verify Your Email With Lancelot",
         "HtmlBody": emailTemplate,
