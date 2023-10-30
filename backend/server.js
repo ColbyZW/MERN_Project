@@ -29,7 +29,7 @@ app.post("/register", async (request, response) => {
 
     let client = new postmark.ServerClient(postmarkApiKey);
     let res = await client.sendEmail({
-        "From": "co001438@ucf.edu",
+        "From": "enter your email in here",
         "To": postBody.email,
         "Subject": "Please Verify Your Email With Lancelot",
         "HtmlBody": emailTemplate,
