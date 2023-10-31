@@ -1,8 +1,10 @@
-const express = require('express')
+import express from 'express'
+import passport from 'passport'
+import GoogleStrategy from 'passport-google-oauth2'
+import session from 'express-session'
+import { authHandler } from './util.js'
+
 const app = express()
-const passport = require('passport')
-const GoogleStrategy = require('passport-google-oauth2')
-const session = require('express-session')
 const port = 8000
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID
@@ -23,7 +25,7 @@ passport.use(new GoogleStrategy({
         const userName = profile.displayName
 
         // The second argument of done is the user from the database
-        return done(null, {})
+        return done(null, {"email": userEmail})
     }
 ))
 
@@ -34,7 +36,6 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user, done) => {
     done(null, user)
 })
-
 
 // Set up the express middleware
 app.use(session({
