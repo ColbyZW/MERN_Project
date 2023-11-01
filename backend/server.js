@@ -3,6 +3,7 @@ import passport from 'passport'
 import GoogleStrategy from 'passport-google-oauth2'
 import session from 'express-session'
 import { authHandler } from './util.js'
+import { userRouter } from './routes/user.js';
 
 const app = express()
 const port = 8000
@@ -46,6 +47,7 @@ app.use(express.urlencoded())
 app.use(passport.initialize())
 app.use(passport.authenticate('session'))
 
+app.use("/user", userRouter)
 
 app.listen(port, () => {
     console.log(`Server listening on port: ${port}`)
