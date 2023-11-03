@@ -23,5 +23,12 @@ services:
       - ./backend:/src
       - ignore:/src/node_modules
 
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./conf:/etc/nginx/conf.d/
+
 volumes:
   ignore:
