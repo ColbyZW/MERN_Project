@@ -10,7 +10,7 @@ function App() {
         </p>
         <a
           className="App-link"
-          href="http://localhost:8000/auth/google"
+          href="http://137.184.121.207:8000/auth/google"
           target="_blank"
           rel="noopener noreferrer"
         >
