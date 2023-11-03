@@ -2,8 +2,9 @@ import express from 'express'
 import passport from 'passport'
 import GoogleStrategy from 'passport-google-oauth2'
 import session from 'express-session'
-import { authHandler } from './util.js'
-import { userRouter } from './routes/user.js';
+import { userRouter } from './routes/userRoute.js';
+import mongoose from 'mongoose'
+import { User } from './models/User.js'
 
 const app = express()
 const port = 8000
@@ -11,6 +12,16 @@ const port = 8000
 const googleClientId = process.env.GOOGLE_CLIENT_ID
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
 const callbackURL = process.env.CALLBACK_URL
+const mongoURL = process.env.MONGO_URL
+
+// Connect to the DB
+main().catch(err => {
+    console.log("Error connecting to DB");
+    console.log(err)
+})
+async function main() {
+    await mongoose.connect(mongoURL)
+}
 
 // Setup the OAUTH middleware
 passport.use(new GoogleStrategy({
@@ -19,14 +30,20 @@ passport.use(new GoogleStrategy({
     callbackURL: callbackURL,
     passReqToCallback: true
     },
-    function (request, accessToken, refreshToken, profile, done) {
+    async function (request, accessToken, refreshToken, profile, done) {
         // We need to use this to create a new user in the database
         const userId = profile.id
         const userEmail = profile.email
         const userName = profile.displayName
+        const user = new User({
+            name: userName,
+            userId: userId,
+            email: userEmail
+        })
+        await user.save()
 
         // The second argument of done is the user from the database
-        return done(null, {"email": userEmail})
+        return done(null, user)
     }
 ))
 

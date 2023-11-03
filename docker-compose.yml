@@ -4,7 +4,6 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - mongodb
       - node-server
     volumes:
       - ./frontend:/src
@@ -20,8 +19,6 @@ services:
       - ./.env
     ports:
       - "8000:8000"
-    depends_on:
-      - mongodb
     volumes:
       - ./backend:/src
       - ignore:/src/node_modules
