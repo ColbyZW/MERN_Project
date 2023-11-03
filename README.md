@@ -8,4 +8,5 @@ Make sure you have Docker installed on your computer.  After that navigate into 
 ## Environment Variables
 We're going to use a remote MongoDB cluster so we have to pass that url into the server.  To do that go into the 
 `.env-template` file and copy it over to a new file called `.env` and replace the `REPLACE ME` text with the URL 
-for the MongoDB cluster.
+for the MongoDB cluster.  
+Check discord for the Oauth env credentials
