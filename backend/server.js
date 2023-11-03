@@ -13,6 +13,7 @@ const googleClientId = process.env.GOOGLE_CLIENT_ID
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
 const callbackURL = process.env.CALLBACK_URL
 const mongoURL = process.env.MONGO_URL
+const redirectURL = process.env.REDIRECT_URL
 
 // Connect to the DB
 main().catch(err => {
@@ -35,23 +36,28 @@ passport.use(new GoogleStrategy({
         const userId = profile.id
         const userEmail = profile.email
         const userName = profile.displayName
-        const user = new User({
-            name: userName,
-            userId: userId,
-            email: userEmail
-        })
-        await user.save()
+        let user = await User.findById(userId);
+        if (user === null) {
+            console.log("No user found, making a new one")
+            user = new User({
+                name: userName,
+                _id: userId,
+                email: userEmail
+            })
+            await user.save()
+        }
 
-        // The second argument of done is the user from the database
         return done(null, user)
     }
 ))
 
 passport.serializeUser((user, done) => {
+    console.log(user)
     done(null, user)
 })
 
 passport.deserializeUser((user, done) => {
+    console.log(user)
     done(null, user)
 })
 
@@ -83,7 +89,7 @@ app.get('/auth/google/callback',
 }))
 
 app.get('/auth/google/success', (req, res) => {
-    res.status(200).send("SUCCESS")
+    res.status(301).redirect(redirectURL)
 })
 
 app.get('/auth/google/failure', (req, res) => {
