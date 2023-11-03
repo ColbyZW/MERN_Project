@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
     name: String,
     email: String, 
-    userId: String,
+    _id: String,
     createdAt: {type: Schema.Types.Date, default: Date.now},
     lancer: {type: Schema.Types.ObjectId, ref: 'Lancer'},
     client: {type: Schema.Types.ObjectId, ref: "Client"}
