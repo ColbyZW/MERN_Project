@@ -1,5 +1,7 @@
 import express from 'express'
 import passport from 'passport'
+import cors from 'cors'
+import MongoStore from 'connect-mongo'
 import GoogleStrategy from 'passport-google-oauth2'
 import session from 'express-session'
 import { userRouter } from './routes/userRoute.js';
@@ -14,6 +16,7 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
 const callbackURL = process.env.CALLBACK_URL
 const mongoURL = process.env.MONGO_URL
 const redirectURL = process.env.REDIRECT_URL
+const baseURL = process.env.BASE_URL
 
 // Connect to the DB
 main().catch(err => {
@@ -31,7 +34,7 @@ passport.use(new GoogleStrategy({
     callbackURL: callbackURL,
     passReqToCallback: true
     },
-    async function (request, accessToken, refreshToken, profile, done) {
+    async function verify(request, accessToken, refreshToken, profile, done) {
         // We need to use this to create a new user in the database
         const userId = profile.id
         const userEmail = profile.email
@@ -52,25 +55,42 @@ passport.use(new GoogleStrategy({
 ))
 
 passport.serializeUser((user, done) => {
+    console.log("SERIALIZING")
     console.log(user)
-    done(null, user)
+    process.nextTick(() => {
+        done(null, { id: user._id, email: user.email, name: user.name })
+    })
 })
 
 passport.deserializeUser((user, done) => {
+    console.log("DESERIALIZING")
     console.log(user)
-    done(null, user)
+    process.nextTick(() => {
+       done(null, user)
+    })
 })
+
+
 
 // Set up the express middleware
 app.use(session({
     secret: "supersecret",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: mongoURL }),
+}))
+app.use(cors({
+    credentials: true, 
+    origin: baseURL,
+    methods: "GET,POST,PUT,DELETE"
 }))
 app.use(express.json())
 app.use(express.urlencoded())
-app.use(passport.initialize())
 app.use(passport.authenticate('session'))
 
+// Initialize extra routes
 app.use("/user", userRouter)
+
 
 app.listen(port, () => {
     console.log(`Server listening on port: ${port}`)
@@ -83,10 +103,10 @@ app.get("/auth/google",
 
 // Callback to handle OAUTH Responses
 app.get('/auth/google/callback',
-    passport.authenticate('google', {
-        successRedirect: '/auth/google/success',
-        failureRedirect: '/auth/google/failure'
-}))
+    passport.authenticate('google', {failureRedirect: '/auth/google/failure'}),
+    function (req, res) {
+        res.redirect(redirectURL);
+    })
 
 app.get('/auth/google/success', (req, res) => {
     res.status(301).redirect(redirectURL)

@@ -1,6 +1,7 @@
-import './App.css';
+import './MainPage.css';
+import React from 'react'
 
-function App() {
+function MainPage() {
 
   return (
     <div className="App">
@@ -20,4 +21,4 @@ function App() {
   );
 }
 
-export default App;
+export default MainPage;

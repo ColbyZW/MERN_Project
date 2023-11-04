@@ -3,6 +3,10 @@ export const userRouter = express.Router();
 import { User } from '../models/User.js';
 import { Lancer } from '../models/Lancer.js';
 import { Client } from '../models/Client.js';
+import { authHandler } from '../util.js';
+
+// Comment this out if you want to test locally with postman
+userRouter.use(authHandler)
 
 userRouter.get('/logout', (req, res) => {
     req.logout((err) => {
