@@ -5,8 +5,16 @@ import MongoStore from 'connect-mongo'
 import GoogleStrategy from 'passport-google-oauth2'
 import session from 'express-session'
 import { userRouter } from './routes/userRoute.js';
-import mongoose from 'mongoose'
+import { projectRouter } from './routes/projectRoute.js'
+import mongoose, {Schema} from 'mongoose'
 import { User } from './models/User.js'
+import fs from 'fs'
+
+fs.readdirSync('./models').forEach((file) => {
+    if (~file.indexOf('.js')) {
+        import('./models/' + file)
+    }
+})
 
 const app = express()
 const port = 8000
@@ -39,12 +47,12 @@ passport.use(new GoogleStrategy({
         const userId = profile.id
         const userEmail = profile.email
         const userName = profile.displayName
-        let user = await User.findById(userId);
+        let user = await User.findOne({googleId: userId});
         if (user === null) {
             console.log("No user found, making a new one")
             user = new User({
                 name: userName,
-                _id: userId,
+                googleId: userId,
                 email: userEmail
             })
             await user.save()
@@ -88,6 +96,7 @@ app.use(passport.authenticate('session'))
 
 // Initialize extra routes
 app.use("/user", userRouter)
+app.use("/project", projectRouter)
 
 
 app.listen(port, () => {
