@@ -61,3 +61,7 @@ userRouter.post('/client', async (req, res) => {
     res.status(200).send({"message": "Successfully created Client account"})
     return
 })
+
+userRouter.get('/name', (req, res) => {
+    res.status(200).send({"name": req.session.passport.user.name})
+})

@@ -56,7 +56,6 @@ passport.use(new GoogleStrategy({
 
 passport.serializeUser((user, done) => {
     console.log("SERIALIZING")
-    console.log(user)
     process.nextTick(() => {
         done(null, { id: user._id, email: user.email, name: user.name })
     })
@@ -64,7 +63,6 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((user, done) => {
     console.log("DESERIALIZING")
-    console.log(user)
     process.nextTick(() => {
        done(null, user)
     })
