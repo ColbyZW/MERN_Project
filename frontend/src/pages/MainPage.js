@@ -12,8 +12,8 @@ function MainPage() {
   return (
     <div className="main d-flex flex-column content">
       <Header/>
-      <div className="w-100 d-flex justify-content-between">
-        <div className="px-4 d-flex flex-column justify-content-center w-50 text-center">
+      <div className="w-100 d-flex center-content align-items-start justify-content-between">
+        <div className="px-4 d-flex flex-column w-50 text-center">
           <div className="h4">
             Connecting Community Crafts & Needs
           </div>
@@ -23,7 +23,7 @@ function MainPage() {
             work. Engage today and enrich your local connections.
           </div>
         </div>
-        <Card className="mx-5 w-50 text-center pt-3 mint shadow-lg">
+        <Card className="mx-5 h-100 w-50 text-center pt-3 mint shadow-lg">
           <Card.Body>
             <Card.Title className="mb-3">
               <p className="h4 dark-mint-text">Welcome to Lancelot!</p>

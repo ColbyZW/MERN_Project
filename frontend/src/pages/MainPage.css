@@ -32,3 +32,7 @@
     background-size: 33rem;
     background-position: left 2rem bottom -3rem;
 }
+
+.center-content {
+    height: 35vh;
+}
