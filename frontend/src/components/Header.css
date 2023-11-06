@@ -5,3 +5,17 @@
     height: 30vh;
     width: 100vw;
 }
+
+
+@media (max-width: 759.9px) {
+    .title {
+        font-size: medium;
+        font-weight: bold;
+    }
+}
+
+@media (min-width: 760px) {
+    .title {
+        color: black;
+    }
+}

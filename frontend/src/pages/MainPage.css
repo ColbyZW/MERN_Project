@@ -12,6 +12,8 @@
 
 .mint {
     background-color: var(--mint);
+    min-width: min-content;
+    min-height: min-content;
 }
 
 .gray {
@@ -26,13 +28,26 @@
     min-height: 100vh;
 }
 
-.content {
-    background-image: url(../assets/forefront.svg);
-    background-repeat: no-repeat;
-    background-size: 33rem;
-    background-position: left 2rem bottom -3rem;
-}
+
 
 .center-content {
     height: 35vh;
+}
+
+@media (max-width: 575.9px) {
+    .content {
+        background-image: url(../assets/forefront.svg);
+        background-repeat: no-repeat;
+        background-size: 28rem;
+        background-position: left 50% bottom 5%;
+    }
+}
+
+@media (min-width: 576px) {
+    .content {
+        background-image: url(../assets/forefront.svg);
+        background-repeat: no-repeat;
+        background-size: 33rem;
+        background-position: left 2rem bottom -3rem;
+    }
 }
