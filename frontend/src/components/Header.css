@@ -1,7 +1,7 @@
 .head {
-    background-image: url(../assets/header.png);
+    background-image: url(../assets/header.svg);
     background-repeat: no-repeat;
-    background-size: cover;
-    width: 100vw;
+    background-size: 100vw auto;
     height: 30vh;
+    width: 100vw;
 }
