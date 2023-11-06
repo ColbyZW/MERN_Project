@@ -2,7 +2,10 @@ const redirectURL = process.env.REDIRECT_URL
 
 export function authHandler(req, res, next) {
     if (!req.session.passport) {
-        res.redirect(redirectURL);
+        res.status(403).send({
+            "message": "UNAUTHORIZED",
+            "redirect": "/"
+        });
     } else {
         next()
     }
