@@ -19,8 +19,9 @@ userRouter.get('/logout', (req, res) => {
 })
 
 userRouter.post('/lancer', async (req, res) => {
-    const {userId, company} = req.body
-    const user = await User.findById(userId).exec()
+    const {company} = req.body
+    const {id} = req.session.passport.user
+    const user = await User.findById(id).exec()
 
     if (user === null) {
         res.status(400).send({"message": "Unable to find account"})
@@ -41,8 +42,9 @@ userRouter.post('/lancer', async (req, res) => {
 })
 
 userRouter.post('/client', async (req, res) => {
-    const {userId, company} = req.body
-    const user = await User.findById(userId).exec()
+    const {company} = req.body
+    const {id} = req.session.passport.user
+    const user = await User.findById(id).exec()
 
     if (user === null) {
         res.status(400).send({"message": "Unable to find account"})
