@@ -9,7 +9,7 @@ const userSchema = new Schema({
     createdAt: {type: Schema.Types.Date, default: Date.now},
     lancer: {type: Schema.Types.ObjectId, ref: 'Lancer'},
     client: {type: Schema.Types.ObjectId, ref: "Client"},
-    fullyRegistered: Boolean
+    fullyRegistered: {type: Schema.Types.Boolean, default: false}
 })
 
 export const User = mongoose.model('User', userSchema)
