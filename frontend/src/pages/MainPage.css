@@ -25,10 +25,9 @@
 }
 
 .main {
-    min-height: 100vh;
+    min-height: 740px;
+    height: 100vh;
 }
-
-
 
 .center-content {
     height: 35vh;

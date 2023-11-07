@@ -12,7 +12,7 @@ function MainPage() {
   return (
     <div className="main d-flex flex-column content">
       <Header/>
-      <div className="vw-100 d-flex flex-column flex-sm-row center-content align-items-center align-items-sm-start">
+      <div className="mt-3 vw-100 d-flex flex-column flex-sm-row center-content align-items-center align-items-sm-start">
         <div className="px-4 d-flex flex-column vw-sm-25 text-center">
           <div className="h4">
             Connecting Community Crafts & Needs
@@ -29,7 +29,7 @@ function MainPage() {
               <p className="h4 dark-mint-text">Welcome to Lancelot!</p>
               <p className="h6 gray">Please Sign in/Register</p>
             </Card.Title>
-            <div className="py-4 d-flex flex-column justify-content-center align-items-center">
+            <div className="py-4 d-flex h-100 flex-column justify-content-center align-items-center">
               <GoogleButton onClick={googleLogin} text={"Sign in with Google"} />
               <div className="my-2">or</div>
               <GoogleButton onClick={googleLogin} text={"Register with Google"}/>

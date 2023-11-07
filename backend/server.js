@@ -65,12 +65,13 @@ passport.use(new GoogleStrategy({
 passport.serializeUser((user, done) => {
     console.log("SERIALIZING")
     process.nextTick(() => {
-        done(null, { id: user._id, email: user.email, name: user.name })
+        done(null, { id: user._id, email: user.email, name: user.name, registered: user.fullyRegistered })
     })
 })
 
 passport.deserializeUser((user, done) => {
     console.log("DESERIALIZING")
+    console.log(user)
     process.nextTick(() => {
        done(null, user)
     })
@@ -110,13 +111,19 @@ app.get("/auth/google",
 
 // Callback to handle OAUTH Responses
 app.get('/auth/google/callback',
-    passport.authenticate('google', {failureRedirect: '/auth/google/failure'}),
-    function (req, res) {
-        res.redirect(redirectURL);
-    })
+    passport.authenticate('google', {
+        failureRedirect: '/auth/google/failure',
+        successRedirect: '/auth/google/success'
+    }))
 
 app.get('/auth/google/success', (req, res) => {
-    res.status(301).redirect(redirectURL)
+    if (req.session.passport.user.registered) {
+        // If they are registered redirect them to the home screen
+        res.status(301).redirect(redirectURL + "home")
+    } else {
+        // Otherwise we redirect them to the registration screen
+        res.status(301).redirect(redirectURL + "register")
+    }
 })
 
 app.get('/auth/google/failure', (req, res) => {

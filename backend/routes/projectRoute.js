@@ -1,7 +1,7 @@
 import express from 'express';
 export const projectRouter = express.Router();
 import { User } from '../models/User.js';
-import { authHandler } from '../util.js';
+import { authHandler, unableToFindAccount } from '../util.js';
 import { Project } from '../models/Project.js';
 import { Message } from '../models/Message.js';
 import { ProjectMessage } from '../models/ProjectMessage.js';
@@ -44,6 +44,19 @@ projectRouter.post('/', async (req, res) => {
     return;
 })
 
+projectRouter.get('/', async (req, res) => {
+    const {id} = req.session.passport.user;
+
+    const user = await User.findById(id).populate('client').exec();
+    if (user === null) {
+        unableToFindAccount(res)
+    }
+
+    const projects = await Project.find({}).sort({dateCreated: 'desc'}).exec()
+    res.status(200).send(projects);
+    return;
+})
+
 // Route to get an existing project
 projectRouter.get('/:projectId', async (req, res) => {
     // Pull out the user ID
@@ -51,7 +64,7 @@ projectRouter.get('/:projectId', async (req, res) => {
 
     const user = await User.findById(id).populate('client').exec();
     if (user === null) {
-        res.status(400).send({"message": "Unable to locate account"});
+        unableToFindAccount(res)
         return;
     }
 
@@ -126,7 +139,7 @@ projectRouter.post('/message', async (req, res) => {
 
     const user = await User.findById(id).populate('client').exec();
     if (user === null) {
-        res.status(400).send({"message": "Unable to locate account"});
+        unableToFindAccount(res)
         return;
     }
 
@@ -169,7 +182,7 @@ projectRouter.post('/update', async (req, res) => {
 
     const user = await User.findById(id).populate('client').exec();
     if (user === null) {
-        res.status(400).send({"message": "Unable to locate account"});
+        unableToFindAccount(res)
         return;
     }
 
