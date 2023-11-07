@@ -31,6 +31,9 @@ services:
       - "80:80"
     volumes:
       - ./conf:/etc/nginx/conf.d/
+    depends_on:
+      - react
+      - node-server
 
 volumes:
   ignore:
