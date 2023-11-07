@@ -10,3 +10,10 @@ export function authHandler(req, res, next) {
         next()
     }
 }
+
+export function unableToFindAccount(res) {
+    res.status(400).send({
+        "message": "Unable to locate account",
+        "redirect": "/"
+    });
+}
