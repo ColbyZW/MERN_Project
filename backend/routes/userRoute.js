@@ -67,3 +67,8 @@ userRouter.post('/client', async (req, res) => {
 userRouter.get('/name', (req, res) => {
     res.status(200).send({"name": req.session.passport.user.name})
 })
+
+// Utility route to call on every page to ensure user is logged in
+userRouter.get("/isLoggedIn", (req, res) => {
+    res.status(200).send({"message": "User logged in"});
+})
