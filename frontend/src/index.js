@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import MainPage from './pages/MainPage.js';
-import Home from './pages/Home';
+import LancelotNav from './components/LancelotNav';
+import Home from './pages/Home.js';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
@@ -12,12 +13,18 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 // is reached on the browser
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/*",
     element: <MainPage/>
   },
   {
     path: "/home",
-    element: <Home/>
+    element: <LancelotNav/>,
+    children: [
+      {
+        index: true,
+        element: <Home/>
+      }
+    ]
   }
 ])
 
