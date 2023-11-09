@@ -6,6 +6,7 @@ import LancelotNav from './components/LancelotNav';
 import Home from './pages/Home.js';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import JobList from './pages/JobList';
 
 // In this router we specify the paths that are available on the website
 // like /login, /createPost, etc
@@ -13,16 +14,20 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 // is reached on the browser
 const router = createBrowserRouter([
   {
-    path: "/*",
+    path: "*",
     element: <MainPage/>
   },
   {
-    path: "/home",
+    path: "home",
     element: <LancelotNav/>,
     children: [
       {
         index: true,
-        element: <Home/>
+        element: <JobList/>
+      },
+      {
+        path: "job/:id",
+        element: <div>Ok</div>
       }
     ]
   }

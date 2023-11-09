@@ -209,12 +209,19 @@ projectRouter.post('/update', async (req, res) => {
     }
 
     const {name, description, pay, startDate, endDate} = req.body;
-    project.name = name;
-    project.description = description;
-    project.pay = pay;
-    project.startDate = startDate;
-    project.endDate = endDate;
-    await project.save()
+    if (name && description && pay && startDate && endDate) {
+        project.name = name;
+        project.description = description;
+        project.pay = pay;
+        project.startDate = startDate;
+        project.endDate = endDate;
+        await project.save()
 
-    res.status(200).send({"message": "Successfully updated project details"})
+        res.status(200).send({"message": "Successfully updated project details"})
+        return;
+    } else {
+        res.status(400).send({"message": "Missing some fields"});
+        return;
+    }
+
 })

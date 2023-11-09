@@ -1,0 +1,7 @@
+.no-focus:focus {
+    box-shadow: none !important;
+}
+
+.no-focus:hover {
+    filter: brightness(75%);
+}
