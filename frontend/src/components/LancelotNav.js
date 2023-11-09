@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Navbar, Container, Nav } from "react-bootstrap";
+import './LancelotNav.css'
 
 const serverURL = process.env.REACT_APP_SERVER_URL
 
@@ -25,12 +26,12 @@ function LancelotNav() {
     }
     return (
         <div>
-            <Navbar expand="lg" className="bg-body-tertiary">
+            <Navbar sticky="top" expand="lg" className="bg-body-tertiary">
                 <Container style={{backgroundColor: "var(--peach)"}} fluid>
                     <Navbar.Brand  href="/home">Lancelot</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="me-auto">
+                    <Navbar.Toggle className="no-focus" aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse className="no-focus" id="basic-navbar-nav">
+                        <Nav className="me-auto no-focus">
                             <Nav.Link href="/home">Browse Jobs</Nav.Link>
                             <Nav.Link href="/home/newJob">Post a Job</Nav.Link>
                             <Nav.Link href="/home/profile">Profile</Nav.Link>

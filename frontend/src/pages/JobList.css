@@ -1,0 +1,8 @@
+.job-card:hover {
+    filter: brightness(75%);
+    transition: all 250ms ease;
+}
+
+.job-card {
+    cursor: pointer;
+}

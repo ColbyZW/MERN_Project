@@ -71,7 +71,6 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((user, done) => {
     console.log("DESERIALIZING")
-    console.log(user)
     process.nextTick(() => {
        done(null, user)
     })
