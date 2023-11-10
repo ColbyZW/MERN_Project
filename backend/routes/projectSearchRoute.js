@@ -3,7 +3,7 @@ export const projectSearchRouter = express.Router();
 import { Project } from '../models/Project.js'; // Update the path to your model
 
 // Search Endpoint
-router.get('/search', async (req, res) => {
+router.get('/projectSearchRouter', async (req, res) => {
     try {
         const query = {};
 
@@ -21,5 +21,3 @@ router.get('/search', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
-module.exports = router;

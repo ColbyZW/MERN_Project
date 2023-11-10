@@ -107,7 +107,7 @@ app.use(passport.authenticate('session'))
 app.use("/user", userRouter)
 app.use("/project", projectRouter)
 app.use("/test", testRouter)
-app.use('/projectSearch', projectSearchRouter);
+app.use("/projectSearch", projectSearchRouter);
 
 
 app.listen(port, () => {
