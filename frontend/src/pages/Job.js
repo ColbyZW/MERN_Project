@@ -108,7 +108,10 @@ function Job() {
                         <Card className="my-2">
                             <Card.Header className="d-flex justify-content-between">
                                 <div>{message.creator.name}</div>
-                                <div>{new Date(message.createdAt).toDateString()} {new Date(message.createdAt).toLocaleTimeString()}</div>
+                                <Stack className="align-items-end">
+                                    <div>{new Date(message.createdAt).toDateString()}</div> 
+                                    <div>{new Date(message.createdAt).toLocaleTimeString()}</div>
+                                </Stack>
                             </Card.Header>
                             <Card.Body>
                                 <Card.Title>
