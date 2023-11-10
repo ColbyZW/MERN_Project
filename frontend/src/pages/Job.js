@@ -59,6 +59,9 @@ function Job() {
         if (file) {
             formData.append("photo", file)
         }
+        if (message === null || message.trim() === "") {
+            return;
+        }
         formData.append("message", message)
         formData.append("projectId", id)
         fetch(serverURL + "/project/message", {
