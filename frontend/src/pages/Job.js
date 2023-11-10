@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Container, Form, Stack, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import './Job.css'
+import Options from "../components/Options";
+import MessageCard from "../components/MessageCard";
+import JobInfoCard from "../components/JobInfoCard";
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
 function Job() {
+    const [userInfo, setUserInfo] = useState()
     const { id } = useParams();
     const [job, setJob] = useState(null)
     const [file, setFile] = useState(null)
-    const [message, setMessage] = useState(null)
+    const [message, setMessage] = useState("")
     const [fileKey, setFileKey] = useState(0)
 
     function getJobInfo() {
@@ -20,32 +24,20 @@ function Job() {
         })
     }
 
+    function getUserInfo() {
+        fetch(serverURL + "/user")
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 400) {
+                setUserInfo(data)
+            }
+        })
+    }
+
     useEffect(() => {
         getJobInfo();
+        getUserInfo();
     }, [])
-
-    function renderJobCard(job) {
-        return (
-        <Card>
-            <Card.Header className="d-flex justify-content-between">
-                <Stack>
-                    <h5>{job.title}</h5>
-                    <h6>Pay: {job.pay}</h6>
-                    <h6>Posted By: {job.client.company}</h6>
-                </Stack>
-                <Stack className="align-items-end">
-                    <h6>Start: {new Date(job.startDate).toDateString()}</h6>
-                    <h6>End: {new Date(job.endDate).toDateString()}</h6>
-                </Stack>            
-            </Card.Header>
-            <Card.Body>
-                <Card.Text>
-                    {job.description}
-                </Card.Text>
-            </Card.Body>
-        </Card>
-        )
-    }
 
     function handleFile(e) {
         setFile(e.currentTarget.files[0])
@@ -105,23 +97,7 @@ function Job() {
                 <Card.Body>
                     {job.projectMessage.messages.map(message => {
                         return (
-                        <Card className="my-2">
-                            <Card.Header className="d-flex justify-content-between">
-                                <div>{message.creator.name}</div>
-                                <Stack className="align-items-end">
-                                    <div>{new Date(message.createdAt).toDateString()}</div> 
-                                    <div>{new Date(message.createdAt).toLocaleTimeString()}</div>
-                                </Stack>
-                            </Card.Header>
-                            <Card.Body>
-                                <Card.Title>
-                                </Card.Title>
-                                <Card.Text>
-                                    {message.messageContents}
-                                </Card.Text>
-                            {message.photos.length > 0 && <Card.Img className="msg-img" variant="bottom" src={message.photos[0].url}/>}
-                            </Card.Body>
-                        </Card>
+                            <MessageCard key={message._id} handleChange={() => getJobInfo()} message={message} userInfo={userInfo}/>
                         )
                     })}
                 </Card.Body>
@@ -132,7 +108,7 @@ function Job() {
     return (
         <Container fluid>
             {!job && renderSpinner()}
-            {job && renderJobCard(job)}
+            {job && <JobInfoCard handleChange={() => getJobInfo()} userInfo={userInfo} job={job}/>}
             {job && renderJobMessages(job)}
         </Container>
     )
