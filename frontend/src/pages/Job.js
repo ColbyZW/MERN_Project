@@ -55,12 +55,12 @@ function Job() {
     }
 
     function handleSubmit() {
+        if (message === null || message.trim() === "") {
+            return;
+        }
         const formData = new FormData();
         if (file) {
             formData.append("photo", file)
-        }
-        if (message === null || message.trim() === "") {
-            return;
         }
         formData.append("message", message)
         formData.append("projectId", id)
@@ -106,7 +106,7 @@ function Job() {
                         <Card className="my-2">
                             <Card.Header className="d-flex justify-content-between">
                                 <div>{message.creator.name}</div>
-                                <div>{new Date(message.createdAt).toDateString()}</div>
+                                <div>{new Date(message.createdAt).toDateString()} {new Date(message.createdAt).toLocaleTimeString()}</div>
                             </Card.Header>
                             <Card.Body>
                                 <Card.Title>
