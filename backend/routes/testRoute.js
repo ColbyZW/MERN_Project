@@ -19,6 +19,7 @@ const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: 'freelancelot', // Replace with your bucket name.
+    acl: 'public-read', // Setting ACL to public-read
     contentType: multerS3.AUTO_CONTENT_TYPE, // Automatically set the content type
     contentDisposition: 'inline', // Setting ContentDisposition to inline
     metadata: function (req, file, cb) {
