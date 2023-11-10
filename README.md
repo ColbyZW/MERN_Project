@@ -2,10 +2,8 @@
 COP4331 Large MERN Project
 
 ## Environment Variables
-We're going to use a remote MongoDB cluster so we have to pass that url into the server.  To do that go into the 
-`.env-template` file and copy it over to a new file called `.env` and replace the `REPLACE ME` text with the URL 
-for the MongoDB cluster.  
-Check discord for the Oauth env credentials
+Copy everything in the `.env-template` file into a new file called `.env`.  
+After that go into the `.env` file and replace all of the fields that say `REPLACE ME` with the stuff pinned in Discord.  
 
 ## Running the Project in Docker
 MAKE SURE YOU MADE THE `.env` file in the previous step.  Make sure you have Docker installed on your computer.  After that navigate into the project directory and run  
