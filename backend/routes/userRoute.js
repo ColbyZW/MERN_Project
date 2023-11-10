@@ -2,7 +2,9 @@ import express from 'express';
 export const userRouter = express.Router();
 import { User } from '../models/User.js';
 import { Lancer } from '../models/Lancer.js';
+import { LancerAccount } from '../models/LancerAccount.js';
 import { Client } from '../models/Client.js';
+import { ClientAccount } from '../models/ClientAccount.js';
 import { authHandler } from '../util.js';
 
 // Comment this out if you want to test locally with postman
@@ -36,7 +38,16 @@ userRouter.post('/lancer', async (req, res) => {
     })
     await lancer.save()
 
+    const lancerAccount = new LancerAccount(
+        {
+            lancer: lancer,
+            balance: 0
+        }
+    )
+    await lancerAccount.save()
+
     user.lancer = lancer._id;
+    user.fullyRegistered = true;
     await user.save()
 
     res.status(200).send({"message": "Successfully created Lancer account"})
@@ -60,7 +71,16 @@ userRouter.post('/client', async (req, res) => {
     })
     await client.save()
 
+    const clientAccount = new ClientAccount(
+        {
+            client: client,
+            balance: 0
+        }
+    )
+    await clientAccount.save()
+
     user.client = client._id;
+    user.fullyRegistered = true;
     await user.save()
 
     res.status(200).send({"message": "Successfully created Client account"})
