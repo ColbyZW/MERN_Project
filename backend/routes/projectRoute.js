@@ -228,15 +228,17 @@ projectRouter.post('/update', async (req, res) => {
 
 // Search Endpoint
 projectRouter.get('/search', async (req, res) => {
+    
     try {
-        const searchQuery = req.query.description || ''; // Get the search term from query parameters
+        const searchTerm = req.query.q; // Get the search term from query parameters
 
         // Create a regex for case-insensitive partial matching
-        const descriptionRegex = new RegExp(searchQuery, 'i');
+        const searchRegex = new RegExp(searchTerm, 'i');
 
-        const results = await Project.find({ Description: descriptionRegex });
+        const results = await Project.find({ Description: searchRegex });
         res.json(results);
     } catch (error) {
         res.status(500).send(error.message);
     }
+    
 });
