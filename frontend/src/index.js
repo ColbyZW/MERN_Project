@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import MainPage from './pages/MainPage.js';
 import LancelotNav from './components/LancelotNav';
-import Home from './pages/Home.js';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import JobList from './pages/JobList';
