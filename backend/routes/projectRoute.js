@@ -227,7 +227,7 @@ projectRouter.post('/update', async (req, res) => {
 })
 
 // Search Endpoint
-projectRouter.get('/projectSearch', async (req, res) => {
+projectRouter.get('/Search', async (req, res) => {
     try {
         const query = {};
 
