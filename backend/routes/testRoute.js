@@ -1,6 +1,7 @@
-const AWS = require('aws-sdk');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
+import AWS from 'aws-sdk';
+import multer from 'multer';
+import multerS3 from 'multer-s3';
+export const testRouter = express.Router();
 
 const express = require('express');
 const app = express();
@@ -26,7 +27,7 @@ const s3 = new AWS.S3();
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'your-bucket-name', // Replace with your bucket name.
+    bucket: 'freelancelot', // Replace with your bucket name.
     metadata: function (req, file, cb) {
       cb(null, { fieldName: file.fieldname });
     },
