@@ -40,16 +40,14 @@ function JobList() {
         return (
             jobList.map(job => (
                 <Card onClick={() => jobClick(job._id)} className="my-2 job-card">
+                    <Card.Header className="d-flex justify-content-between">
+                        <Stack>
+                            <h5>{job.name}</h5>
+                            <div>{job.pay}</div>
+                        </Stack>
+                        <div>Posted: {new Date(job.createdAt).toDateString()}</div>
+                    </Card.Header>
                     <Card.Body>
-                        <Card.Title>
-                            <Container fluid className="px-0 mx-0 d-flex justify-content-between">
-                                <Stack>
-                                    <div>{job.name}</div>
-                                    <div>{job.pay}</div>
-                                </Stack>
-                                <div>{new Date(job.startDate).toDateString()}</div>
-                            </Container>
-                        </Card.Title>
                         <Card.Text className="text-truncate">{job.description}</Card.Text>
                     </Card.Body>
                 </Card>
