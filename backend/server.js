@@ -10,6 +10,7 @@ import mongoose, {Schema} from 'mongoose'
 import { User } from './models/User.js'
 import fs from 'fs'
 import { testRouter } from './routes/testRoute.js'
+import { Photo } from './models/Photo.js'
 
 fs.readdirSync('./models').forEach((file) => {
     if (~file.indexOf('.js')) {
@@ -48,15 +49,22 @@ passport.use(new GoogleStrategy({
         const userId = profile.id
         const userEmail = profile.email
         const userName = profile.displayName
+        const userPhotoURL = profile._json.picture;
         let user = await User.findOne({googleId: userId});
         if (user === null) {
             console.log("No user found, making a new one")
+            const photo = new Photo({
+                filename: "profilePicture",
+                url: userPhotoURL
+            })
             user = new User({
                 name: userName,
                 googleId: userId,
-                email: userEmail
+                email: userEmail,
+                photo: photo._id
             })
             await user.save()
+            await photo.save()
         }
 
         return done(null, user)

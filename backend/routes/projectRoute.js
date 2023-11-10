@@ -55,6 +55,7 @@ projectRouter.post('/', async (req, res) => {
     return;
 })
 
+// Route to get all projects
 projectRouter.get('/', async (req, res) => {
     const {id} = req.session.passport.user;
 
@@ -124,7 +125,8 @@ projectRouter.get('/:projectId', async (req, res) => {
         createdAt,
         updatedAt,
         clientReview,
-        lancerReview
+        lancerReview,
+        _id
     } = project;
 
     const payload = {
@@ -140,7 +142,8 @@ projectRouter.get('/:projectId', async (req, res) => {
         updatedAt: updatedAt,
         clientReviews: clientReview,
         lancerReviews: lancerReview,
-        isPostCreator: isPostCreator
+        isPostCreator: isPostCreator,
+        _id: _id
     }
 
     res.status(200).send(payload);
@@ -195,6 +198,24 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
     await project.save();
 
     res.status(200).send({"message": "Successfully added message to the project"})
+})
+
+// Route to delete a message
+projectRouter.delete('/message/:id', async (req, res) => {
+    const {id} = req.params
+    await Message.deleteOne({_id: id}).exec()
+    return res.status(200).send({"message": "Successfully deleted message"})
+})
+
+// Route to update a message
+projectRouter.put('/message', async (req, res) => {
+    const {id, message} = req.body;
+    const msg = await Message.findById(id).exec()
+    msg.messageContents = message;
+    msg.updatedAt = Date.now()
+    await msg.save()
+
+    return res.status(200).send({"message": "Successfully updated message"})
 })
 
 // Route to update a Project
