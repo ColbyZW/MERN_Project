@@ -1,17 +1,8 @@
 import AWS from 'aws-sdk';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
+import express from 'express'
 export const testRouter = express.Router();
-
-const express = require('express');
-const app = express();
-
-app.use(express.json());
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
 // Configure AWS with your access and secret key.
 AWS.config.update({
@@ -38,7 +29,7 @@ const upload = multer({
 });
 
 // Create an API endpoint to handle the file upload.
-app.post('/upload', upload.single('file'), function (req, res) {
+testRouter.post('/upload', upload.single('photo'), function (req, res) {
   res.send({
     message: 'File uploaded successfully',
     data: req.file
