@@ -10,6 +10,7 @@ function Job() {
     const [job, setJob] = useState(null)
     const [file, setFile] = useState(null)
     const [message, setMessage] = useState(null)
+    const [fileKey, setFileKey] = useState(0)
 
     function getJobInfo() {
         fetch(serverURL + "/project/" + id)
@@ -75,6 +76,7 @@ function Job() {
             setFile(null)
             setMessage("")
             getJobInfo()
+            setFileKey(key => key+1)
         })
     }
 
@@ -96,7 +98,7 @@ function Job() {
                         <Form.Control value={message} onChange={handleText} as="textarea" rows={3}></Form.Control>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Control value={file} onChange={handleFile} type="file" size="sm"/>
+                        <Form.Control key={fileKey} onChange={handleFile} type="file" size="sm"/>
                     </Form.Group>
                     <Button className="my-1" onClick={handleSubmit} variant="secondary">Submit</Button>
                 </Card.Body>
