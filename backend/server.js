@@ -10,7 +10,6 @@ import mongoose, {Schema} from 'mongoose'
 import { User } from './models/User.js'
 import fs from 'fs'
 import { testRouter } from './routes/testRoute.js'
-import { projectSearchRouter } from './routes/projectSearchRoute.js'
 
 fs.readdirSync('./models').forEach((file) => {
     if (~file.indexOf('.js')) {
@@ -99,7 +98,6 @@ app.use(passport.authenticate('session'))
 // Initialize extra routes
 app.use("/user", userRouter)
 app.use("/project", projectRouter)
-app.use("/projectSearch", projectRouter);
 app.use("/test", testRouter)
 
 
