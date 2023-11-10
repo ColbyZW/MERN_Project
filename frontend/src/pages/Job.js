@@ -66,9 +66,9 @@ function Job() {
                 // do something
             }
             setFile(null)
+            setFileKey(key => key+1)
             setMessage("")
             getJobInfo()
-            setFileKey(key => key+1)
         })
     }
 

@@ -13,7 +13,7 @@ function Options({setEdit, handleDelete}) {
             variant="secondary"
             title="..."
         >
-            <Dropdown.Item onClick={handleDelete()}>Delete</Dropdown.Item>
+            <Dropdown.Item onClick={handleDelete}>Delete</Dropdown.Item>
             <Dropdown.Item onClick={() => setEdit(true)}>Edit</Dropdown.Item>
         </DropdownButton>
     )
