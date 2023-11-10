@@ -39,7 +39,7 @@ function JobList() {
     function renderJobs(jobList) {
         return (
             jobList.map(job => (
-                <Card onClick={() => jobClick(job._id)} className="my-2 job-card">
+                <Card key={job._id} onClick={() => jobClick(job._id)} className="my-2 job-card">
                     <Card.Header className="d-flex justify-content-between">
                         <Stack>
                             <h5>{job.name}</h5>
