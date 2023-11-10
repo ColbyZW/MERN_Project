@@ -5,6 +5,8 @@ import { authHandler, unableToFindAccount } from '../util.js';
 import { Project } from '../models/Project.js';
 import { Message } from '../models/Message.js';
 import { ProjectMessage } from '../models/ProjectMessage.js';
+import { upload } from './testRoute.js';
+import { Photo } from '../models/Photo.js';
 
 projectRouter.use(authHandler)
 
@@ -24,6 +26,7 @@ projectRouter.post('/', async (req, res) => {
         return;
     }
 
+
     // Pull out the payload fields
     const { title, description, pay, startDate, endDate } = req.body;
     const project = new Project({
@@ -35,6 +38,14 @@ projectRouter.post('/', async (req, res) => {
         endDate: endDate
     })
 
+    const projectMessage = new ProjectMessage({
+        project: project._id,
+        messages: []
+    })
+
+    project.projectMessages = projectMessage._id
+
+    await projectMessage.save();
     await project.save();
 
     res.status(200).send({
@@ -52,7 +63,7 @@ projectRouter.get('/', async (req, res) => {
         unableToFindAccount(res)
     }
 
-    const projects = await Project.find({}).sort({dateCreated: 'desc'}).exec()
+    const projects = await Project.find({}).sort({createdAt: 'desc'}).exec()
     res.status(200).send(projects);
     return;
 })
@@ -79,19 +90,23 @@ projectRouter.get('/:projectId', async (req, res) => {
                 path: 'messages',
                 populate: {
                     path: 'photos'
-                }
+                },
+
             }
         })
         .populate('clientReview')
         .populate('lancerReview')
         .exec();
     
-        console.log(project.projectMessages)
+    
     if (project === null) {
         res.status(404).send({"message": "Unable to locate project"});
         return;
     }
 
+    for (let i = 0; i < project.projectMessages.messages.length; i++) {
+        await project.projectMessages.messages[i].populate('creator')
+    }
     let isPostCreator = false;
     if (user.client && project.client._id.toString() === user.client._id.toString()) {
         isPostCreator = true;
@@ -133,7 +148,7 @@ projectRouter.get('/:projectId', async (req, res) => {
 })
 
 // Route to add a message to a project
-projectRouter.post('/message', async (req, res) => {
+projectRouter.post('/message', upload.single('photo'), async (req, res) => {
     // Pull out the user ID
     const { id } = req.session.passport.user;
 
@@ -143,15 +158,22 @@ projectRouter.post('/message', async (req, res) => {
         return;
     }
 
-    // image handling done here (probably want to extract this out into a standalone
-    // function that we can call within other routes as well)
-    // for now I'm just setting the photos to empty
+    let photo;
+    if (req.file) {
+        const file = req.file;
+        photo = new Photo({
+            url: file.location,
+            filename: file.originalname
+        })
+        await photo.save()
+    }
 
     const { message, projectId } = req.body;
     const project = await Project.findById(projectId).exec()
     const msg = new Message({
         messageContents: message,
-        creator: user._id
+        creator: user._id,
+        photos: [photo]
     })
     await msg.save()
 

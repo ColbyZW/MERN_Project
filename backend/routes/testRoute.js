@@ -15,7 +15,7 @@ AWS.config.update({
 const s3 = new AWS.S3();
 
 // Set up the multer-s3 configuration.
-const upload = multer({
+export const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: 'freelancelot', // Replace with your bucket name.
