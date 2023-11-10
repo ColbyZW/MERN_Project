@@ -55,12 +55,12 @@ function Job() {
     }
 
     function handleSubmit() {
+        if (message === null || message.trim() === "") {
+            return;
+        }
         const formData = new FormData();
         if (file) {
             formData.append("photo", file)
-        }
-        if (message === null || message.trim() === "") {
-            return;
         }
         formData.append("message", message)
         formData.append("projectId", id)
