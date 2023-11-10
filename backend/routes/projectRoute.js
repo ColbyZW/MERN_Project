@@ -225,3 +225,23 @@ projectRouter.post('/update', async (req, res) => {
     }
 
 })
+
+// Search Endpoint
+projectSearchRouter.get('/search', async (req, res) => {
+    try {
+        const query = {};
+
+        // Add search criteria to the query object based on the request query parameters
+        for (const key in req.query) {
+            if (req.query[key]) {
+                // For simplicity, using direct assignment. Customize as needed.
+                query[key] = req.query[key];
+            }
+        }
+
+        const results = await Project.find(query);
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});

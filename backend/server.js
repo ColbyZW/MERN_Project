@@ -99,8 +99,8 @@ app.use(passport.authenticate('session'))
 // Initialize extra routes
 app.use("/user", userRouter)
 app.use("/project", projectRouter)
+app.use("/projectSearch", projectRouter);
 app.use("/test", testRouter)
-app.use("/projectSearch", projectSearchRouter);
 
 
 app.listen(port, () => {
