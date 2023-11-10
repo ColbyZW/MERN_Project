@@ -9,6 +9,7 @@ import { projectRouter } from './routes/projectRoute.js'
 import mongoose, {Schema} from 'mongoose'
 import { User } from './models/User.js'
 import fs from 'fs'
+import { testRouter } from './routes/testRoute.js'
 
 fs.readdirSync('./models').forEach((file) => {
     if (~file.indexOf('.js')) {
@@ -97,6 +98,7 @@ app.use(passport.authenticate('session'))
 // Initialize extra routes
 app.use("/user", userRouter)
 app.use("/project", projectRouter)
+app.use("/test", testRouter)
 
 
 app.listen(port, () => {
