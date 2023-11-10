@@ -3,7 +3,7 @@ export const projectSearchRouter = express.Router();
 import { Project } from '../models/Project.js'; // Update the path to your model
 
 // Search Endpoint
-router.get('/projectSearchRouter', async (req, res) => {
+projectSearchRouter.get('/search', async (req, res) => {
     try {
         const query = {};
 
