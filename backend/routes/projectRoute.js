@@ -236,7 +236,7 @@ projectRouter.get('/search', async (req, res) => {
         const searchRegex = new RegExp(searchTerm, 'i');
 
         const results = await Project.find({ description: searchRegex });
-        res.send(results);
+        res.json(results);
     } catch (error) {
         res.status(500).send(error.message);
     }
