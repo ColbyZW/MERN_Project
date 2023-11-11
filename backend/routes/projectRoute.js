@@ -29,6 +29,11 @@ projectRouter.post('/', async (req, res) => {
 
     // Pull out the payload fields
     const { title, description, pay, startDate, endDate } = req.body;
+    if (!title || !description || !pay || !startDate || !endDate) {
+        res.status(400).send("Please fill out all fields");
+        return;
+    }
+
     const project = new Project({
         client: user.client._id,
         name: title,
