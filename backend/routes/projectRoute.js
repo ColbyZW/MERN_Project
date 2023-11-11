@@ -95,8 +95,9 @@ projectRouter.get('/:projectId', async (req, res) => {
 
     // Pull out the projectId
     const { projectId } = req.params;
-
-    const project = await Project.findById(projectId)
+    let project;
+    try {
+    project = await Project.findById(projectId)
         .populate('client')
         .populate({
             path: 'projectMessages',
@@ -111,6 +112,10 @@ projectRouter.get('/:projectId', async (req, res) => {
         .populate('clientReview')
         .populate('lancerReview')
         .exec();
+    } catch {
+        res.status(400).send({"message": "Inavlid projectId"})
+        return;
+    }
     
     
     if (project === null) {
@@ -189,7 +194,14 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
         res.status(400).send({"message": "Please fill out all fields"});
         return;
     }
-    const project = await Project.findById(projectId).exec()
+
+    let project;
+    try {
+        project = await Project.findById(projectId).exec()
+    } catch {
+        res.status(400).send({"message": "Invalid projectId"});
+        return;
+    }
     const msg = new Message({
         messageContents: message,
         creator: user._id,
@@ -231,10 +243,17 @@ projectRouter.put('/message', async (req, res) => {
         res.status(400).send({"message": "Please fill out all fields"});
         return;
     }
-    const msg = await Message.findById(id).exec()
-    msg.messageContents = message;
-    msg.updatedAt = Date.now()
-    await msg.save()
+
+    let msg;
+    try {
+        msg = await Message.findById(id).exec()
+        msg.messageContents = message;
+        msg.updatedAt = Date.now()
+        await msg.save()
+    } catch {
+        res.status(400).send({"message": "Invalid messageId"})
+        return;
+    }
 
     return res.status(200).send({"message": "Successfully updated message"})
 })
@@ -255,12 +274,18 @@ projectRouter.post('/update', async (req, res) => {
     }
 
     const { projectId } = req.body;
-    const project = await Project.findById(projectId)
-        .populate('client')
-        .populate('projectMessages')
-        .populate('clientReview')
-        .populate('lancerReview')
-        .exec();
+    let project;
+    try {
+        project = await Project.findById(projectId)
+            .populate('client')
+            .populate('projectMessages')
+            .populate('clientReview')
+            .populate('lancerReview')
+            .exec();
+    } catch {
+        res.status(400).send({"message": "Invalid projectId"});
+        return;
+    }
 
     if (project === null) {
         res.status(404).send({"message": "Unable to locate project"});
