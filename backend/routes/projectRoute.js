@@ -268,3 +268,73 @@ projectRouter.post('/update', async (req, res) => {
     }
 
 })
+
+// Route to assign a Lancer to a Project
+projectRouter.patch('/assign', async(req, res) =>{
+    // Pull out the user ID
+    const { id } = req.session.passport.user;
+
+    // User should be a lancer, instead of a client
+    const user = await User.findById(id).populate('lancer').exec();
+    if (user === null) {
+        unableToFindAccount(res)
+        return;
+    }
+
+    const { projectId } = req.body;
+    const project = await Project.findById(projectId)
+        .populate('lancer')
+        .exec();
+
+    if (project === null) {
+        res.status(404).send({"message": "Unable to locate project"});
+        return;
+    }
+
+    if (project.lancer != null)
+    {
+        res.status(500).send({"message": "Project already has an assigned Lancer"});
+        return;
+    }
+
+    project.lancer = user;
+    await project.save();
+    
+    res.status(200).send({"message": "Lancer sucessfully assigned to project"});
+    return;
+})
+
+// Route to assign a Lancer to a Project
+projectRouter.patch('/unassign', async(req, res) =>{
+    // Pull out the user ID
+    const { id } = req.session.passport.user;
+
+    // User should be a lancer, instead of a client
+    const user = await User.findById(id).populate('lancer').exec();
+    if (user === null) {
+        unableToFindAccount(res)
+        return;
+    }
+
+    const { projectId } = req.body;
+    const project = await Project.findById(projectId)
+        .populate('lancer')
+        .exec();
+
+    if (project === null) {
+        res.status(404).send({"message": "Unable to locate project"});
+        return;
+    }
+
+    if (user != project.lancer)
+    {
+        res.status(500).send({"message": "Cannot unassign another Lancer from a project"});
+        return;
+    }
+
+    project.lancer = null;
+    await project.save();
+    
+    res.status(200).send({"message": "Lancer sucessfully unassigned from project"});
+    return;
+})
