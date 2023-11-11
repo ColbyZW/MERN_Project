@@ -304,6 +304,7 @@ projectRouter.patch('/assign', async(req, res) =>{
 
     const { projectId } = req.body;
     const project = await Project.findById(projectId)
+        .populate('name')
         .populate('lancer')
         .exec();
 
@@ -318,7 +319,7 @@ projectRouter.patch('/assign', async(req, res) =>{
         return;
     }
 
-    project.lancer = user;
+    project.lancer = user.lancer;
     await project.save();
     
     res.status(200).send({"message": "Lancer sucessfully assigned to project"});
@@ -347,7 +348,7 @@ projectRouter.patch('/unassign', async(req, res) =>{
         return;
     }
 
-    if (user != project.lancer)
+    if (user.lancer.ObjectId != project.lancer.ObjectId)
     {
         res.status(500).send({"message": "Cannot unassign another Lancer from a project"});
         return;
