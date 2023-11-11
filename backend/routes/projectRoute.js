@@ -29,6 +29,11 @@ projectRouter.post('/', async (req, res) => {
 
     // Pull out the payload fields
     const { title, description, pay, startDate, endDate } = req.body;
+    if (!title || !description || !pay || !startDate || !endDate) {
+        res.status(400).send("Please fill out all fields");
+        return;
+    }
+
     const project = new Project({
         client: user.client._id,
         name: title,
@@ -53,6 +58,14 @@ projectRouter.post('/', async (req, res) => {
         "postId": project._id
     });
     return;
+})
+
+projectRouter.delete("/:projectId", async (req, res) => {
+    const {projectId} = req.params;
+    const project = await Project.findById(projectId).exec();
+    await ProjectMessage.deleteOne({_id: project.projectMessages._id}).exec()
+    await Project.deleteOne({_id: project._id}).exec()
+    res.status(200).send({"message": "Successfully deleted project"});
 })
 
 // Route to get all projects
@@ -172,6 +185,10 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
     }
 
     const { message, projectId } = req.body;
+    if (!message || !projectId) {
+        res.status(400).send({"message": "Please fill out all fields"});
+        return;
+    }
     const project = await Project.findById(projectId).exec()
     const msg = new Message({
         messageContents: message,
@@ -210,6 +227,10 @@ projectRouter.delete('/message/:id', async (req, res) => {
 // Route to update a message
 projectRouter.put('/message', async (req, res) => {
     const {id, message} = req.body;
+    if (!message || !id) {
+        res.status(400).send({"message": "Please fill out all fields"});
+        return;
+    }
     const msg = await Message.findById(id).exec()
     msg.messageContents = message;
     msg.updatedAt = Date.now()

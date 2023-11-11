@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Container, Form, Stack, Spinner } from "react-bootstrap";
+import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import './Job.css'
-import Options from "../components/Options";
 import MessageCard from "../components/MessageCard";
 import JobInfoCard from "../components/JobInfoCard";
 

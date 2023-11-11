@@ -2,8 +2,6 @@ import React from "react"
 import { Dropdown, DropdownButton, ButtonGroup } from "react-bootstrap";
 import './Options.css'
 
-const serverURL = process.env.REACT_APP_SERVER_URL
-
 function Options({setEdit, handleDelete}) {
 
     return (

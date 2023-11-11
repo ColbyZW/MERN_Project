@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import MainPage from './pages/MainPage.js';
+import CreateJob from './pages/CreateJob';
 import LancelotNav from './components/LancelotNav';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "job/:id",
         element: <Job/>
+      },
+      {
+        path: "newJob",
+        element: <CreateJob/>
       }
     ]
   }
