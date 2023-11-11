@@ -232,7 +232,12 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
 // Route to delete a message
 projectRouter.delete('/message/:id', async (req, res) => {
     const {id} = req.params
-    await Message.deleteOne({_id: id}).exec()
+    try {
+        await Message.deleteOne({_id: id}).exec()
+    } catch {
+        res.status(400).send({"message": "Invalid messageId"})
+        return;
+    }
     return res.status(200).send({"message": "Successfully deleted message"})
 })
 

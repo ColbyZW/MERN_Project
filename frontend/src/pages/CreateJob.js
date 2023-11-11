@@ -43,11 +43,17 @@ function CreateJob() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
-        }).then(res => res.json())
-        .then(data => {
-            if (data.status === 400) {
-                return;
+        })
+        .then(res => {
+            if (res.status !== 200) {
+                setErr(true)
+                setErrMsg("We encountered an error making your post");
+                return false;
             }
+            return res.json()
+        })
+        .then(data => {
+            if (!data) return;
             navigate("/home/job/" + data.postId)
         })
     }

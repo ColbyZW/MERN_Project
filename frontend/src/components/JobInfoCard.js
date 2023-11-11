@@ -29,8 +29,18 @@ function JobInfoCard({job, userInfo, handleChange}) {
 
     function handleDelete() {
         fetch(serverURL + "/project/" + job._id, {method: "DELETE"})
-        .then(res => res.json())
-        .then(() => navigate("/home"))
+        .then(res => {
+            if (res.status !== 200) {
+                setErr(true)
+                setErrMsg("We encountered an error deleting your post")
+                return false
+            }
+            return res.json()
+        })
+        .then((data) => {
+            if (!data) return;
+            navigate("/home")
+        })
     }
 
     function handleSubmit() {
@@ -54,10 +64,19 @@ function JobInfoCard({job, userInfo, handleChange}) {
             },
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
+        .then(res => {
+            if (res.status !== 200) {
+                setErr(true)
+                setErrMsg("We encountered an error submitting your post")
+                return false
+            }
+            return res.json()
+        })
         .then((data) => {
+            if (!data) return;
             handleChange()
             setEditing(false)
+            setErr(false)
         })
     }
 

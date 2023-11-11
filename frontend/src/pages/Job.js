@@ -14,6 +14,8 @@ function Job() {
     const [file, setFile] = useState(null)
     const [message, setMessage] = useState("")
     const [fileKey, setFileKey] = useState(0)
+    const [err, setErr] = useState(false)
+    const [errMsg, setErrMsg] = useState("")
     const navigate = useNavigate()
 
     function getJobInfo() {
@@ -55,6 +57,8 @@ function Job() {
 
     function handleSubmit() {
         if (message === null || message.trim() === "") {
+            setErr(true)
+            setErrMsg("No blank messages, please")
             return;
         }
         const formData = new FormData();
@@ -66,15 +70,21 @@ function Job() {
         fetch(serverURL + "/project/message", {
             method: "POST",
             body: formData
-        }).then(res => res.json())
-        .then(data => {
-            if (data.status === 400) {
-                // do something
+        }).then(res => {
+            if (res.status !== 200) {
+                setErr(true)
+                setErrMsg("We encountered an issue adding your message")
+                return false;
             }
+            return res.json()
+        })
+        .then(data => {
+            if (!data) return;
             setFile(null)
             setFileKey(key => key+1)
             setMessage("")
             getJobInfo()
+            setErr(false)
         })
     }
 
@@ -99,6 +109,7 @@ function Job() {
                         <Form.Control key={fileKey} onChange={handleFile} type="file" size="sm"/>
                     </Form.Group>
                     <Button className="my-1" onClick={handleSubmit} variant="secondary">Submit</Button>
+                    {err && <p className="text-danger">{errMsg}</p>}
                 </Card.Body>
                 <Card.Body>
                     {job.projectMessage.messages.map(message => {
