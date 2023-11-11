@@ -185,6 +185,10 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
     }
 
     const { message, projectId } = req.body;
+    if (!message || !projectId) {
+        res.status(400).send({"message": "Please fill out all fields"});
+        return;
+    }
     const project = await Project.findById(projectId).exec()
     const msg = new Message({
         messageContents: message,
@@ -223,6 +227,10 @@ projectRouter.delete('/message/:id', async (req, res) => {
 // Route to update a message
 projectRouter.put('/message', async (req, res) => {
     const {id, message} = req.body;
+    if (!message || !id) {
+        res.status(400).send({"message": "Please fill out all fields"});
+        return;
+    }
     const msg = await Message.findById(id).exec()
     msg.messageContents = message;
     msg.updatedAt = Date.now()
