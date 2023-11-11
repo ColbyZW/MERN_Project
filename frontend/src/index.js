@@ -2,11 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import MainPage from './pages/MainPage.js';
+import CreateJob from './pages/CreateJob';
 import LancelotNav from './components/LancelotNav';
-import Home from './pages/Home.js';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import JobList from './pages/JobList';
+import Job from './pages/Job';
 
 // In this router we specify the paths that are available on the website
 // like /login, /createPost, etc
@@ -27,7 +28,11 @@ const router = createBrowserRouter([
       },
       {
         path: "job/:id",
-        element: <div>Ok</div>
+        element: <Job/>
+      },
+      {
+        path: "newJob",
+        element: <CreateJob/>
       }
     ]
   }
