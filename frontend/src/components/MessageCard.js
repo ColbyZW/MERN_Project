@@ -6,12 +6,19 @@ const serverURL = process.env.REACT_APP_SERVER_URL;
 function MessageCard({message, userInfo, handleChange}) {
     const [editing, setEditing] = useState(false)
     const [messageContents, setMessageContents] = useState(message.messageContents)
+    const [err, setErr] = useState(false)
+    const [errMsg, setErrMsg] = useState("")
 
     function handleText(e) {
         setMessageContents(e.target.value)
     }
 
     function handleSubmit() {
+        if (messageContents.trim() === "") {
+            setErr(true)
+            setErrMsg("No blank messages, please")
+            return;
+        }
         const payload = {message: messageContents, id: message._id}
         fetch(serverURL + '/project/message', {
             method: "PUT",
@@ -45,11 +52,14 @@ function MessageCard({message, userInfo, handleChange}) {
             </Card.Header>
             <Card.Body>
                 {editing && 
-                <Form.Group>
-                    <Form.Label>Write a message</Form.Label>
-                    <Form.Control value={messageContents} onChange={handleText} as="textarea" rows={3}></Form.Control>
-                    <Button variant="secondary" onClick={handleSubmit}>Finish</Button>
-                </Form.Group>
+                <div>
+                    <Form.Group>
+                        <Form.Label>Write a message</Form.Label>
+                        <Form.Control value={messageContents} onChange={handleText} as="textarea" rows={3}></Form.Control>
+                        <Button variant="secondary" onClick={handleSubmit}>Finish</Button>
+                    </Form.Group>
+                    {err && <p className="text-danger">{errMsg}</p>}
+                </div>
                 }
                 {!editing && 
                     <Card.Text>
