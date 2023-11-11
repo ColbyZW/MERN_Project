@@ -15,7 +15,7 @@ function LancelotNav() {
             navigate(data.redirect)
           }
         })
-    }, [])
+    }, [navigate])
 
     function handleLogout() {
         fetch(serverURL + "/user/logout")

@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { Card, Stack, Form, Button, InputGroup } from "react-bootstrap";
 import Options from "./Options";
+import { useNavigate } from "react-router-dom";
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
@@ -10,6 +11,9 @@ function JobInfoCard({job, userInfo, handleChange}) {
     const [title, setTitle] = useState(job.title)
     const [pay, setPay] = useState(job.pay)
     const [jobDesc, setJobDesc] = useState(job.description)
+    const navigate = useNavigate()
+    const [err, setErr] = useState(false)
+    const [errMsg, setErrMsg] = useState("")
 
     function handleTitle(e) {
         setTitle(e.target.value)
@@ -24,13 +28,20 @@ function JobInfoCard({job, userInfo, handleChange}) {
     }
 
     function handleDelete() {
-
+        fetch(serverURL + "/project/" + job._id, {method: "DELETE"})
+        .then(res => res.json())
+        .then(() => navigate("/home"))
     }
 
     function handleSubmit() {
+        if (title.trim() === "" || jobDesc.trim() === "" || pay.trim() === "") {
+            setErr(true)
+            setErrMsg("Make sure there are no blank fields");
+            return
+        }
         const payload = {
-            name: title,
-            description: jobDesc,
+            name: title.trim(),
+            description: jobDesc.trim(),
             pay: pay,
             startDate: job.startDate,
             endDate: job.endDate,
@@ -78,6 +89,7 @@ function JobInfoCard({job, userInfo, handleChange}) {
                     <Form.Control value={jobDesc} onChange={handleJobDesc} as="textarea" rows={3}></Form.Control>
                     <Button variant="secondary" onClick={handleSubmit}>Finish</Button>
                 </Form.Group>
+                {err && <p className="text-danger">{errMsg}</p>}
                 </Card.Body>
             </Card>
             }

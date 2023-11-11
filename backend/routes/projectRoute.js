@@ -55,6 +55,14 @@ projectRouter.post('/', async (req, res) => {
     return;
 })
 
+projectRouter.delete("/:projectId", async (req, res) => {
+    const {projectId} = req.params;
+    const project = await Project.findById(projectId).exec();
+    await ProjectMessage.deleteOne({_id: project.projectMessages._id}).exec()
+    await Project.deleteOne({_id: project._id}).exec()
+    res.status(200).send({"message": "Successfully deleted project"});
+})
+
 // Route to get all projects
 projectRouter.get('/', async (req, res) => {
     const {id} = req.session.passport.user;
