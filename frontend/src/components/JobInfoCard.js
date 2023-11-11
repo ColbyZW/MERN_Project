@@ -53,12 +53,11 @@ function JobInfoCard({job, userInfo, handleChange}) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
-        }).then(res => res.json())
+        })
+        .then(res => res.json())
         .then((data) => {
-            if (data.status !== 400) {
-                handleChange()
-                setEditing(false)
-            }
+            handleChange()
+            setEditing(false)
         })
     }
 

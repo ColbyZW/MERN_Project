@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import './Job.css'
 import MessageCard from "../components/MessageCard";
 import JobInfoCard from "../components/JobInfoCard";
@@ -14,10 +14,17 @@ function Job() {
     const [file, setFile] = useState(null)
     const [message, setMessage] = useState("")
     const [fileKey, setFileKey] = useState(0)
+    const navigate = useNavigate()
 
     function getJobInfo() {
         fetch(serverURL + "/project/" + id)
-        .then(res => res.json())
+        .then(res => {
+            if (res.status === 400) {
+               navigate("/home") 
+               return
+            }
+            return res.json()
+        })
         .then(data => {
             setJob(data)
         })
