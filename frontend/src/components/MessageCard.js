@@ -26,7 +26,8 @@ function MessageCard({message, userInfo, handleChange}) {
             headers: {
                 "Content-Type": "application/json"
             }
-        }).then(res => {
+        })
+        .then(res => {
             if (res.status !== 200) {
                 setErr(true)
                 setErrMsg("We encountered an error submitting your message")
