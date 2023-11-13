@@ -7,6 +7,7 @@ import { Message } from '../models/Message.js';
 import { ProjectMessage } from '../models/ProjectMessage.js';
 import { upload } from './testRoute.js';
 import { Photo } from '../models/Photo.js';
+import { MongoClient } from 'mongodb'
 
 projectRouter.use(authHandler)
 
