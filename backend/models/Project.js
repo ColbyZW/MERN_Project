@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const projectSchema = new Schema({
+    _id: {type: Schema.Types.ObjectId},
     client: {type: Schema.Types.ObjectId, ref: 'Client'},
     lancer: {type: Schema.Types.ObjectId, ref: 'Lancer'},
     projectMessages: {type: Schema.Types.ObjectId, ref: 'ProjectMessage'},
