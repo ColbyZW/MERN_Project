@@ -115,7 +115,7 @@ app.listen(port, () => {
 
 // Initial google auth route
 app.get("/auth/google", 
-    passport.authenticate('google', {scope: ['email', 'profile']})
+    passport.authenticate('google', {scope: ['email', 'profile'], prompt: "select_account consent"})
 )
 
 // Callback to handle OAUTH Responses

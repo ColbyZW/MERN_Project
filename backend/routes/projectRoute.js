@@ -96,8 +96,9 @@ projectRouter.get('/:projectId', async (req, res) => {
 
     // Pull out the projectId
     const { projectId } = req.params;
-
-    const project = await Project.findById(projectId)
+    let project;
+    try {
+    project = await Project.findById(projectId)
         .populate('client')
         .populate({
             path: 'projectMessages',
@@ -112,6 +113,10 @@ projectRouter.get('/:projectId', async (req, res) => {
         .populate('clientReview')
         .populate('lancerReview')
         .exec();
+    } catch {
+        res.status(400).send({"message": "Inavlid projectId"})
+        return;
+    }
     
     
     if (project === null) {
@@ -190,7 +195,14 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
         res.status(400).send({"message": "Please fill out all fields"});
         return;
     }
-    const project = await Project.findById(projectId).exec()
+
+    let project;
+    try {
+        project = await Project.findById(projectId).exec()
+    } catch {
+        res.status(400).send({"message": "Invalid projectId"});
+        return;
+    }
     const msg = new Message({
         messageContents: message,
         creator: user._id,
@@ -221,7 +233,12 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
 // Route to delete a message
 projectRouter.delete('/message/:id', async (req, res) => {
     const {id} = req.params
-    await Message.deleteOne({_id: id}).exec()
+    try {
+        await Message.deleteOne({_id: id}).exec()
+    } catch {
+        res.status(400).send({"message": "Invalid messageId"})
+        return;
+    }
     return res.status(200).send({"message": "Successfully deleted message"})
 })
 
@@ -232,10 +249,17 @@ projectRouter.put('/message', async (req, res) => {
         res.status(400).send({"message": "Please fill out all fields"});
         return;
     }
-    const msg = await Message.findById(id).exec()
-    msg.messageContents = message;
-    msg.updatedAt = Date.now()
-    await msg.save()
+
+    let msg;
+    try {
+        msg = await Message.findById(id).exec()
+        msg.messageContents = message;
+        msg.updatedAt = Date.now()
+        await msg.save()
+    } catch {
+        res.status(400).send({"message": "Invalid messageId"})
+        return;
+    }
 
     return res.status(200).send({"message": "Successfully updated message"})
 })
@@ -256,12 +280,18 @@ projectRouter.post('/update', async (req, res) => {
     }
 
     const { projectId } = req.body;
-    const project = await Project.findById(projectId)
-        .populate('client')
-        .populate('projectMessages')
-        .populate('clientReview')
-        .populate('lancerReview')
-        .exec();
+    let project;
+    try {
+        project = await Project.findById(projectId)
+            .populate('client')
+            .populate('projectMessages')
+            .populate('clientReview')
+            .populate('lancerReview')
+            .exec();
+    } catch {
+        res.status(400).send({"message": "Invalid projectId"});
+        return;
+    }
 
     if (project === null) {
         res.status(404).send({"message": "Unable to locate project"});
@@ -291,56 +321,73 @@ projectRouter.post('/update', async (req, res) => {
 
 })
 
-// Search Endpoint
-projectRouter.get('/search', async (req, res) => {
-   
-    try {
-        /*
+// Route to assign a Lancer to a Project
+projectRouter.patch('/assign', async(req, res) =>{
+    // Pull out the user ID
+    const { id } = req.session.passport.user;
 
-        // Get the search term from query parameters
-        const searchTerm = req.query.q;
-        
-        //query default search index
-        const pipeline = [
-            {
-              $search: {
-                text: {
-                  query: searchTerm,
-                  path: ["name", "description", "pay"],
-                  "fuzzy": {}
-                },
-              },
-            },
-            
-            {
-              $project: {
-                _id: 1,
-              },
-            },
-            
-          ];
-        
-        //create a cursor to the query result set
-        const cursor = await client.db("test").collection("projects").aggregate(pipeline);
-        
-        //collects all documents from the cursor and puts them into an array
-        let docArray = [];
-        await cursor.forEach((doc) => {docArray.push(doc)});
-        */
-        
-        const database = client.db('test');
-        const movies = database.collection('projects');
-    
-        const query = { pay: '$8000' };
-        const movie = await movies.findOne(query);
-        console.log(movie);
-
-        res.json(movie);
-
-    } catch (error) {
-        res.status(500).send(error.message);
-    } finally {
-        await client.close();
+    // User should be a lancer, instead of a client
+    const user = await User.findById(id).populate('lancer').exec();
+    if (user === null) {
+        unableToFindAccount(res)
+        return;
     }
+
+    const { projectId } = req.body;
+    const project = await Project.findById(projectId)
+        .populate('name')
+        .populate('lancer')
+        .exec();
+
+    if (project === null) {
+        res.status(404).send({"message": "Unable to locate project"});
+        return;
+    }
+
+    if (project.lancer != null)
+    {
+        res.status(500).send({"message": "Project already has an assigned Lancer"});
+        return;
+    }
+
+    project.lancer = user.lancer;
+    await project.save();
     
-});
+    res.status(200).send({"message": "Lancer sucessfully assigned to project"});
+    return;
+})
+
+// Route to assign a Lancer to a Project
+projectRouter.patch('/unassign', async(req, res) =>{
+    // Pull out the user ID
+    const { id } = req.session.passport.user;
+
+    // User should be a lancer, instead of a client
+    const user = await User.findById(id).populate('lancer').exec();
+    if (user === null) {
+        unableToFindAccount(res)
+        return;
+    }
+
+    const { projectId } = req.body;
+    const project = await Project.findById(projectId)
+        .populate('lancer')
+        .exec();
+
+    if (project === null) {
+        res.status(404).send({"message": "Unable to locate project"});
+        return;
+    }
+
+    if (user.lancer.ObjectId != project.lancer.ObjectId)
+    {
+        res.status(500).send({"message": "Cannot unassign another Lancer from a project"});
+        return;
+    }
+
+    project.lancer = null;
+    await project.save();
+    
+    res.status(200).send({"message": "Lancer sucessfully unassigned from project"});
+    return;
+})

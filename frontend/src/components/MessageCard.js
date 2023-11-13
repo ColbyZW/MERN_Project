@@ -26,17 +26,37 @@ function MessageCard({message, userInfo, handleChange}) {
             headers: {
                 "Content-Type": "application/json"
             }
-        }).then(res => res.json())
-        .then(() => {
+        })
+        .then(res => {
+            if (res.status !== 200) {
+                setErr(true)
+                setErrMsg("We encountered an error submitting your message")
+                return false
+            }
+            res.json()
+        })
+        .then((data) => {
+            if (!data) return;
             setEditing(false)
             handleChange()
+            setErr(false)
         })
     }
 
     function handleDelete() {
         fetch(serverURL + "/project/message/" + message._id, {method: "DELETE"})
-        .then(res => res.json())
-        .then(() => handleChange())
+        .then(res => {
+            if (res.status === 400) {
+                setErr(true)
+                setErrMsg("We encountered an error deleting your message")
+                return false
+            }
+            return res.json()
+        })
+        .then((data) => {
+            if (!data) return;
+            handleChange()
+        })
     }
 
     return (
