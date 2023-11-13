@@ -7,6 +7,7 @@ import { Message } from '../models/Message.js';
 import { ProjectMessage } from '../models/ProjectMessage.js';
 import { upload } from './testRoute.js';
 import { Photo } from '../models/Photo.js';
+import { MongoClient } from 'mongodb'
 
 projectRouter.use(authHandler)
 
@@ -292,17 +293,54 @@ projectRouter.post('/update', async (req, res) => {
 
 // Search Endpoint
 projectRouter.get('/search', async (req, res) => {
-
+   
     try {
-        const searchTerm = req.query.q; // Get the search term from query parameters
+        /*
 
-        // Create a regex for case-insensitive partial matching
-        const searchRegex = new RegExp(searchTerm, 'i');
+        // Get the search term from query parameters
+        const searchTerm = req.query.q;
+        
+        //query default search index
+        const pipeline = [
+            {
+              $search: {
+                text: {
+                  query: searchTerm,
+                  path: ["name", "description", "pay"],
+                  "fuzzy": {}
+                },
+              },
+            },
+            
+            {
+              $project: {
+                _id: 1,
+              },
+            },
+            
+          ];
+        
+        //create a cursor to the query result set
+        const cursor = await client.db("test").collection("projects").aggregate(pipeline);
+        
+        //collects all documents from the cursor and puts them into an array
+        let docArray = [];
+        await cursor.forEach((doc) => {docArray.push(doc)});
+        */
+        
+        const database = client.db('test');
+        const movies = database.collection('projects');
+    
+        const query = { pay: '$8000' };
+        const movie = await movies.findOne(query);
+        console.log(movie);
 
-        const results = await Project.find({ description: searchRegex });
-        res.json(results);
+        res.json(movie);
+
     } catch (error) {
         res.status(500).send(error.message);
+    } finally {
+        await client.close();
     }
     
 });
