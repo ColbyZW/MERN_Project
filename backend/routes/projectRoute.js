@@ -9,7 +9,55 @@ import { upload } from './testRoute.js';
 import { Photo } from '../models/Photo.js';
 import { MongoClient } from 'mongodb'
 
+const mongoURL = process.env.MONGO_URL
+
 projectRouter.use(authHandler)
+
+// Route to search existing projects
+projectRouter.get('/search', async (req, res) => {
+    
+        try {
+            const client = new MongoClient(mongoURL);
+
+            // Get the search term from query parameters
+            const { searchTerm } = req.params;
+            //query default search index
+            const pipeline = [
+                {
+                $search: {
+                    text: {
+                    query: "1000",
+                    path: ["name", "description", "pay"]
+                    },
+                },
+                },
+                
+                {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    description: 1,
+                    pay: 1
+                },
+                },
+                
+            ];
+            
+            //create a cursor pointing to a set of query results
+            const cursor = await client.db("test").collection("projects").aggregate(pipeline);
+            
+            //collect all documents from the cursor and put them into an array
+            let docArray = [];
+            await cursor.forEach((doc) => {docArray.push(doc)});
+            await client.close();
+            res.status(200).send(docArray);
+
+        } catch (error) {
+            await client.close();
+            res.status(500).send(error.message);
+        } 
+    }
+);
 
 // Route to create a new project
 projectRouter.post('/', async (req, res) => {
@@ -82,6 +130,8 @@ projectRouter.get('/', async (req, res) => {
     res.status(200).send(projects);
     return;
 })
+
+
 
 // Route to get an existing project
 projectRouter.get('/:projectId', async (req, res) => {
@@ -320,5 +370,3 @@ projectRouter.post('/update', async (req, res) => {
     }
 
 })
-
-const searchTerm = req.query.q;
