@@ -35,9 +35,9 @@ projectRouter.get('/search', async (req, res) => {
                 {
                 $project: {
                     _id: 1,
-                    name: 1,
-                    description: 1,
-                    pay: 1
+                    name: 0,
+                    description: 0,
+                    pay: 0
                 },
                 },
                 
