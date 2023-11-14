@@ -20,7 +20,7 @@ projectRouter.get('/search', async (req, res) => {
             const client = new MongoClient(mongoURL);
 
             // Get the search term from query parameters
-            const { searchTerm } = req.params;
+            //const { searchString } = req.params.q;
             //query default search index
             const pipeline = [
                 {
