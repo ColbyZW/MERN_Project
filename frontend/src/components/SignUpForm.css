@@ -1,0 +1,19 @@
+.signup-form {
+    background-color: var(--mint);
+    padding: 50px;
+    border-radius: 20px;
+    min-width: 300px;
+}
+
+.signup-form h1 {
+    color: black;
+    padding: 10%;
+}
+
+.signup-form input {
+    margin-bottom: 10px;
+}
+
+.signup-form button {
+    background-color: var(--dark-mint);
+}
