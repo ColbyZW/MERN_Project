@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import MainPage from './pages/MainPage.js';
+import Registration from './pages/Registration';
 import CreateJob from './pages/CreateJob';
 import LancelotNav from './components/LancelotNav';
 import reportWebVitals from './reportWebVitals';
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "*",
     element: <MainPage/>
+  },
+  {
+    path: "/register",
+    element: <Registration/>
   },
   {
     path: "home",
