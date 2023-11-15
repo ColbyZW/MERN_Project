@@ -13,109 +13,7 @@ const mongoURL = process.env.MONGO_URL
 
 projectRouter.use(authHandler)
 
-// Route to search existing projects
-projectRouter.get('/search', async (req, res) => {
-    
-        try {
-            const client = new MongoClient(mongoURL);
-
-            // Get the search term from query parameters
-            const { searchString } = req.query;
-            //query default search index
-            const pipeline = [
-                {
-                $search: {
-                    text: {
-                    query: searchString,
-                    path: ["name", "description", "pay"]
-                    },
-                },
-                },
-                
-                {
-                $project: {
-                    _id: 1,
-                    name: 0,
-                    description: 0,
-                    pay: 0
-                },
-                },
-                
-            ];
-            
-            //create a cursor pointing to a set of query results
-            const cursor = await client.db("test").collection("projects").aggregate(pipeline);
-            
-            //collect all documents from the cursor and put them into an array
-            let docArray = [];
-            await cursor.forEach((doc) => {docArray.push(doc)});
-            await client.close();
-            res.status(200).send(docArray);
-
-        } catch (error) {
-            await client.close();
-            res.status(500).send(error.message);
-        } 
-    }
-);
-
-// Route to create a new project
-projectRouter.post('/', async (req, res) => {
-    // Pull out the user ID
-    const { id } = req.session.passport.user;
-
-    const user = await User.findById(id).populate('client').exec();
-    if (user === null) {
-        res.status(400).send({"message": "Unable to locate account"});
-        return;
-    }
-
-    if (!user.client) {
-        res.status(400).send({"message": "Not a client account"});
-        return;
-    }
-
-
-    // Pull out the payload fields
-    const { title, description, pay, startDate, endDate } = req.body;
-    if (!title || !description || !pay || !startDate || !endDate) {
-        res.status(400).send("Please fill out all fields");
-        return;
-    }
-
-    const project = new Project({
-        client: user.client._id,
-        name: title,
-        description: description,
-        pay: pay,
-        startDate: startDate,
-        endDate: endDate
-    })
-
-    const projectMessage = new ProjectMessage({
-        project: project._id,
-        messages: []
-    })
-
-    project.projectMessages = projectMessage._id
-
-    await projectMessage.save();
-    await project.save();
-
-    res.status(200).send({
-        "message": "Successfully created post!",
-        "postId": project._id
-    });
-    return;
-})
-
-projectRouter.delete("/:projectId", async (req, res) => {
-    const {projectId} = req.params;
-    const project = await Project.findById(projectId).exec();
-    await ProjectMessage.deleteOne({_id: project.projectMessages._id}).exec()
-    await Project.deleteOne({_id: project._id}).exec()
-    res.status(200).send({"message": "Successfully deleted project"});
-})
+/////////////////////////////Gets////////////////////////////////
 
 // Route to get all projects
 projectRouter.get('/', async (req, res) => {
@@ -131,8 +29,49 @@ projectRouter.get('/', async (req, res) => {
     return;
 })
 
+// Route to search existing projects
+projectRouter.get('/search', async (req, res) => {
+    
+        try {
+            const client = new MongoClient(mongoURL);
 
+            // Get the search term from query parameters
+            const { searchString } = req.query;
+            //query default search index
+            const pipeline = [
+                {
+                    $search: {
+                        text: {
+                        query: searchString,
+                        path: ["name", "description", "pay"]
+                        },
+                    },
+                },
+                
+                {
+                    $project: {
+                        _id: 1,
+                        name: 0,
+                        description: 0,
+                        pay: 0
+                    },
+                },   
+            ];
+            
+            //create a cursor pointing to a set of query results
+            const cursor = await client.db("test").collection("projects").aggregate(pipeline);
+            
+            //collect all documents from the cursor and put them into an array
+            let docArray = [];
+            await cursor.forEach((doc) => {docArray.push(doc)});
+            await client.close();
+            res.status(200).send(docArray);
 
+        } catch (error) {
+            res.status(500).send(error.message);
+        } 
+    }
+);
 // Route to get an existing project
 projectRouter.get('/:projectId', async (req, res) => {
     // Pull out the user ID
@@ -219,6 +158,58 @@ projectRouter.get('/:projectId', async (req, res) => {
     return;
 })
 
+/////////////////////////////posts////////////////////////////////
+
+// Route to create a new project
+projectRouter.post('/', async (req, res) => {
+    // Pull out the user ID
+    const { id } = req.session.passport.user;
+
+    const user = await User.findById(id).populate('client').exec();
+    if (user === null) {
+        res.status(400).send({"message": "Unable to locate account"});
+        return;
+    }
+
+    if (!user.client) {
+        res.status(400).send({"message": "Not a client account"});
+        return;
+    }
+
+
+    // Pull out the payload fields
+    const { title, description, pay, startDate, endDate } = req.body;
+    if (!title || !description || !pay || !startDate || !endDate) {
+        res.status(400).send("Please fill out all fields");
+        return;
+    }
+
+    const project = new Project({
+        client: user.client._id,
+        name: title,
+        description: description,
+        pay: pay,
+        startDate: startDate,
+        endDate: endDate
+    })
+
+    const projectMessage = new ProjectMessage({
+        project: project._id,
+        messages: []
+    })
+
+    project.projectMessages = projectMessage._id
+
+    await projectMessage.save();
+    await project.save();
+
+    res.status(200).send({
+        "message": "Successfully created post!",
+        "postId": project._id
+    });
+    return;
+})
+
 // Route to add a message to a project
 projectRouter.post('/message', upload.single('photo'), async (req, res) => {
     // Pull out the user ID
@@ -280,40 +271,6 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
     res.status(200).send({"message": "Successfully added message to the project"})
 })
 
-// Route to delete a message
-projectRouter.delete('/message/:id', async (req, res) => {
-    const {id} = req.params
-    try {
-        await Message.deleteOne({_id: id}).exec()
-    } catch {
-        res.status(400).send({"message": "Invalid messageId"})
-        return;
-    }
-    return res.status(200).send({"message": "Successfully deleted message"})
-})
-
-// Route to update a message
-projectRouter.put('/message', async (req, res) => {
-    const {id, message} = req.body;
-    if (!message || !id) {
-        res.status(400).send({"message": "Please fill out all fields"});
-        return;
-    }
-
-    let msg;
-    try {
-        msg = await Message.findById(id).exec()
-        msg.messageContents = message;
-        msg.updatedAt = Date.now()
-        await msg.save()
-    } catch {
-        res.status(400).send({"message": "Invalid messageId"})
-        return;
-    }
-
-    return res.status(200).send({"message": "Successfully updated message"})
-})
-
 // Route to update a Project
 projectRouter.post('/update', async (req, res) => {
     // Pull out the user ID
@@ -369,4 +326,50 @@ projectRouter.post('/update', async (req, res) => {
         return;
     }
 
+})
+
+/////////////////////////////Deletes////////////////////////////////
+
+// Route to delete a message
+projectRouter.delete('/message/:id', async (req, res) => {
+    const {id} = req.params
+    try {
+        await Message.deleteOne({_id: id}).exec()
+    } catch {
+        res.status(400).send({"message": "Invalid messageId"})
+        return;
+    }
+    return res.status(200).send({"message": "Successfully deleted message"})
+})
+
+///////////////////////////////Puts/////////////////////////////////
+
+// Route to update a message
+projectRouter.put('/message', async (req, res) => {
+    const {id, message} = req.body;
+    if (!message || !id) {
+        res.status(400).send({"message": "Please fill out all fields"});
+        return;
+    }
+
+    let msg;
+    try {
+        msg = await Message.findById(id).exec()
+        msg.messageContents = message;
+        msg.updatedAt = Date.now()
+        await msg.save()
+    } catch {
+        res.status(400).send({"message": "Invalid messageId"})
+        return;
+    }
+
+    return res.status(200).send({"message": "Successfully updated message"})
+})
+
+projectRouter.delete("/:projectId", async (req, res) => {
+    const {projectId} = req.params;
+    const project = await Project.findById(projectId).exec();
+    await ProjectMessage.deleteOne({_id: project.projectMessages._id}).exec()
+    await Project.deleteOne({_id: project._id}).exec()
+    res.status(200).send({"message": "Successfully deleted project"});
 })
