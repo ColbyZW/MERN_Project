@@ -39,6 +39,9 @@ function JobList() {
 
     function handleSearch(e) {
         setSearch(e.target.value);
+        fetch(serverURL + "/project/search?searchString=" + e.target.value)
+        .then(res => res.json())
+        .then(data => console.log(data));
     }
 
     function renderJobs(jobList) {
