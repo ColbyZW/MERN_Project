@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Container, Spinner, Stack } from "react-bootstrap";
+import { Card, Container, InputGroup, Spinner, Stack, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "./JobList.css"
 
@@ -8,6 +8,7 @@ const serverURL = process.env.REACT_APP_SERVER_URL
 function JobList() {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
     const navigate = useNavigate()
 
     function getJobs() {
@@ -25,7 +26,7 @@ function JobList() {
 
     function renderSpinner() {
         return (
-            <Container className="text-center">
+            <Container fluid className="text-center my-5">
                 <Spinner></Spinner>
                 <p>Fetching jobs...</p>
             </Container>
@@ -34,6 +35,10 @@ function JobList() {
 
     function jobClick(id) {
         navigate("/home/job/" + id)
+    }
+
+    function handleSearch(e) {
+        setSearch(e.target.value);
     }
 
     function renderJobs(jobList) {
@@ -54,8 +59,15 @@ function JobList() {
             ))
         )
     }
+
     return (
         <Container fluid>
+            <div className="w-100">
+                <InputGroup>
+                    <InputGroup.Text>Search</InputGroup.Text>
+                    <Form.Control value={search} onChange={handleSearch}/>
+                </InputGroup>
+            </div>
             {
                 loading && renderSpinner()
             }
