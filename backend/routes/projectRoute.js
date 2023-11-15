@@ -1,5 +1,6 @@
 import express from 'express';
 export const projectRouter = express.Router();
+import { MongoClient } from "mongodb";
 import { User } from '../models/User.js';
 import { authHandler, unableToFindAccount } from '../util.js';
 import { Project } from '../models/Project.js';
@@ -10,7 +11,7 @@ import { Photo } from '../models/Photo.js';
 import { MongoClient } from 'mongodb';
 const mongoURL = process.env.MONGO_URL
 projectRouter.use(authHandler)
-
+const mongoURL = process.env.MONGO_URL
 // Route to search existing projects
 projectRouter.get('/search', async (req, res) => {
     
@@ -30,7 +31,6 @@ projectRouter.get('/search', async (req, res) => {
                     },
                 },
             },
-            
             {
                 $project: {
                     _id: 1,
