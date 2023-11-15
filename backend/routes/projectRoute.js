@@ -1,6 +1,5 @@
 import express from 'express';
 export const projectRouter = express.Router();
-import { MongoClient } from "mongodb";
 import { User } from '../models/User.js';
 import { authHandler, unableToFindAccount } from '../util.js';
 import { Project } from '../models/Project.js';
@@ -11,7 +10,7 @@ import { Photo } from '../models/Photo.js';
 import { MongoClient } from 'mongodb';
 const mongoURL = process.env.MONGO_URL
 projectRouter.use(authHandler)
-const mongoURL = process.env.MONGO_URL
+
 // Route to search existing projects
 projectRouter.get('/search', async (req, res) => {
     
@@ -20,6 +19,11 @@ projectRouter.get('/search', async (req, res) => {
         await client.connect();
         // Get the search term from query parameters
         const { searchString } = req.query;
+        if (!searchString || !searchString.length) {
+            const projects = await Project.find({}).sort({createdAt: 'desc'}).exec()
+            res.status(200).send(projects);
+            return;
+        }
         //query default search index
         const pipeline = [
             {
@@ -36,7 +40,8 @@ projectRouter.get('/search', async (req, res) => {
                     _id: 1,
                     name: 1,
                     description: 1,
-                    pay: 1
+                    pay: 1,
+                    createdAt: 1
                 },
             },   
         ];

@@ -41,7 +41,7 @@ function JobList() {
         setSearch(e.target.value);
         fetch(serverURL + "/project/search?searchString=" + e.target.value)
         .then(res => res.json())
-        .then(data => console.log(data));
+        .then(data => setJobs(data));
     }
 
     function renderJobs(jobList) {
