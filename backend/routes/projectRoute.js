@@ -7,8 +7,59 @@ import { Message } from '../models/Message.js';
 import { ProjectMessage } from '../models/ProjectMessage.js';
 import { upload } from './testRoute.js';
 import { Photo } from '../models/Photo.js';
-
+import { MongoClient } from 'mongodb';
+const mongoURL = process.env.MONGO_URL
 projectRouter.use(authHandler)
+
+// Route to search existing projects
+projectRouter.get('/search', async (req, res) => {
+    
+    try {
+        const client = new MongoClient(mongoURL);
+        await client.connect();
+        // Get the search term from query parameters
+        const { searchString } = req.query;
+        if (!searchString || !searchString.length) {
+            const projects = await Project.find({}).sort({createdAt: 'desc'}).exec()
+            res.status(200).send(projects);
+            return;
+        }
+        //query default search index
+        const pipeline = [
+            {
+                $search: {
+                    text: {
+                    query: searchString,
+                    path: ["name", "description", "pay"],
+                    fuzzy: {}
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    description: 1,
+                    pay: 1,
+                    createdAt: 1
+                },
+            },   
+        ];
+        
+        //create a cursor pointing to a set of query results
+        const cursor = await client.db("test").collection("projects").aggregate(pipeline);
+        
+        //collect all documents from the cursor and put them into an array
+        let docArray = [];
+        await cursor.forEach((doc) => {docArray.push(doc)});
+        await client.close();
+        res.status(200).send(docArray);
+
+    } catch (error) {
+        res.status(500).send(error.message);
+    } 
+}
+);
 
 // Route to create a new project
 projectRouter.post('/', async (req, res) => {
