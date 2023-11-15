@@ -106,7 +106,21 @@ projectRouter.post('/', async (req, res) => {
 
 projectRouter.delete("/:projectId", async (req, res) => {
     const {projectId} = req.params;
+    const {id} = req.session.passport.user;
+
+    const user = await User.findById(id).populate('client').exec();
+    if (user === null) {
+        res.status(400).send({"message": "Unable to locate account"});
+        return;
+    }
+
     const project = await Project.findById(projectId).exec();
+
+    if (!user.client || user.client._id.toString() !== project.client._id.toString()) {
+        res.status(400).send({"message": "Cannot delete project you didn't create"});
+        return;
+    }
+
     await ProjectMessage.deleteOne({_id: project.projectMessages._id}).exec()
     await Project.deleteOne({_id: project._id}).exec()
     res.status(200).send({"message": "Successfully deleted project"});
@@ -276,7 +290,13 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
 // Route to delete a message
 projectRouter.delete('/message/:id', async (req, res) => {
     const {id} = req.params
+    const userId = req.session.passport.user.id
     try {
+        const msg = Message.findById(id).exec();
+        if (msg.creator._id.toString() != userId.toString()) {
+            res.status(400).send({"message": "Unable to delete a message you didn't write"})
+            return;
+        }
         await Message.deleteOne({_id: id}).exec()
     } catch {
         res.status(400).send({"message": "Invalid messageId"})
@@ -287,6 +307,7 @@ projectRouter.delete('/message/:id', async (req, res) => {
 
 // Route to update a message
 projectRouter.put('/message', async (req, res) => {
+    const userId = req.session.passport.user.id;
     const {id, message} = req.body;
     if (!message || !id) {
         res.status(400).send({"message": "Please fill out all fields"});
@@ -296,6 +317,10 @@ projectRouter.put('/message', async (req, res) => {
     let msg;
     try {
         msg = await Message.findById(id).exec()
+        if (msg.creator._id.toString() != userId.toString()) {
+            res.status(400).send({"message": "Cannot update a message you didn't create"});
+            return;
+        }
         msg.messageContents = message;
         msg.updatedAt = Date.now()
         await msg.save()
@@ -376,6 +401,11 @@ projectRouter.patch('/assign', async(req, res) =>{
         return;
     }
 
+    if (!user.lancer) {
+        res.status(400).send({"message": "Not a lancer account"});
+        return;
+    }
+
     const { projectId } = req.body;
     const project = await Project.findById(projectId)
         .populate('name')
@@ -409,6 +439,11 @@ projectRouter.patch('/unassign', async(req, res) =>{
     const user = await User.findById(id).populate('lancer').exec();
     if (user === null) {
         unableToFindAccount(res)
+        return;
+    }
+
+    if (!user.lancer) {
+        res.status(400).send({"message": "Not a lancer account"});
         return;
     }
 

@@ -1,14 +1,29 @@
 import './MainPage.css';
-import React from 'react';
+import React, {useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import {Card} from 'react-bootstrap';
 import GoogleButton from '../components/GoogleButton.js'
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+const serverURL = process.env.REACT_APP_SERVER_URL
+
 function MainPage() {
   const googleLogin = () => {
     window.location.href = "/auth/google"    
   }
+
+  const navigate = useNavigate()
+  useEffect(() => {
+      fetch(serverURL + "/user/isLoggedIn")
+      .then(response => response.json())
+      .then(data => {
+        if (!data.redirect) {
+          navigate("/home")
+        }
+      })
+  }, [navigate])
+
   return (
     <div className="main d-flex flex-column content">
       <Header/>
