@@ -10,6 +10,50 @@ import { Photo } from '../models/Photo.js';
 
 projectRouter.use(authHandler)
 
+// Route to search existing projects
+projectRouter.get('/search', async (req, res) => {
+    
+    try {
+        const client = new MongoClient(mongoURL);
+
+        // Get the search term from query parameters
+        const { searchString } = req.query;
+        //query default search index
+        const pipeline = [
+            {
+                $search: {
+                    text: {
+                    query: searchString,
+                    path: ["name", "description", "pay"]
+                    },
+                },
+            },
+            
+            {
+                $project: {
+                    _id: 1,
+                    name: 0,
+                    description: 0,
+                    pay: 0
+                },
+            },   
+        ];
+        
+        //create a cursor pointing to a set of query results
+        const cursor = await client.db("test").collection("projects").aggregate(pipeline);
+        
+        //collect all documents from the cursor and put them into an array
+        let docArray = [];
+        await cursor.forEach((doc) => {docArray.push(doc)});
+        await client.close();
+        res.status(200).send(docArray);
+
+    } catch (error) {
+        res.status(500).send(error.message);
+    } 
+}
+);
+
 // Route to create a new project
 projectRouter.post('/', async (req, res) => {
     // Pull out the user ID
