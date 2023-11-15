@@ -7,7 +7,8 @@ import { Message } from '../models/Message.js';
 import { ProjectMessage } from '../models/ProjectMessage.js';
 import { upload } from './testRoute.js';
 import { Photo } from '../models/Photo.js';
-
+import { MongoClient } from 'mongodb';
+const mongoURL = process.env.MONGO_URL
 projectRouter.use(authHandler)
 
 // Route to search existing projects
@@ -15,7 +16,7 @@ projectRouter.get('/search', async (req, res) => {
     
     try {
         const client = new MongoClient(mongoURL);
-
+        await client.connect();
         // Get the search term from query parameters
         const { searchString } = req.query;
         //query default search index
@@ -24,7 +25,8 @@ projectRouter.get('/search', async (req, res) => {
                 $search: {
                     text: {
                     query: searchString,
-                    path: ["name", "description", "pay"]
+                    path: ["name", "description", "pay"],
+                    fuzzy: {}
                     },
                 },
             },
@@ -32,9 +34,9 @@ projectRouter.get('/search', async (req, res) => {
             {
                 $project: {
                     _id: 1,
-                    name: 0,
-                    description: 0,
-                    pay: 0
+                    name: 1,
+                    description: 1,
+                    pay: 1
                 },
             },   
         ];
