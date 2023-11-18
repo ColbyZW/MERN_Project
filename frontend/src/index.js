@@ -19,6 +19,10 @@ const router = createBrowserRouter([
     element: <MainPage/>
   },
   {
+    path: "/profilePage",
+    element: <ProfilePage/>
+  },
+  {
     path: "home",
     element: <LancelotNav/>,
     children: [
