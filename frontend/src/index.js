@@ -8,6 +8,7 @@ import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import JobList from './pages/JobList';
 import Job from './pages/Job';
+import ProfilePage from './pages/ProfilePage';
 
 // In this router we specify the paths that are available on the website
 // like /login, /createPost, etc
@@ -18,10 +19,8 @@ const router = createBrowserRouter([
     path: "*",
     element: <MainPage/>
   },
-  {
-    path: "/profilePage",
-    element: <ProfilePage/>
-  },
+ 
+
   {
     path: "home",
     element: <LancelotNav/>,
@@ -37,6 +36,12 @@ const router = createBrowserRouter([
       {
         path: "newJob",
         element: <CreateJob/>
+      },
+      {
+        path: "profile",
+        element: <ProfilePage/>
+
+
       }
     ]
   }

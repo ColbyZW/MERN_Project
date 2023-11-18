@@ -5,27 +5,41 @@ import './ProfilePage.css';
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
 function ProfilePage() {
-    const [profile, setProfile] = useState({ name: '', email: '', bio: '' });
+    const [profile, setProfile] = useState({ photo: '', name: '', email: '', bio: '' });
     const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
-        // Replace with actual API call to fetch profile data
         fetch(`${serverURL}/profile`)
             .then(response => response.json())
-            .then(data => setProfile(data));
+            .then(data => setProfile(data))
+            .catch(error => {
+                console.error('Error fetching profile:', error);
+            });
     }, []);
 
+    function handleFileChange(event) {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            setProfile({ ...profile, photo: file });
+        }
+    }
+
     function handleSave() {
-        // Save profile data
-        // Replace with actual API call to save profile data
+        const formData = new FormData();
+        formData.append('photo', profile.photo);
+        formData.append('name', profile.name);
+        formData.append('email', profile.email);
+        formData.append('bio', profile.bio);
+
         fetch(`${serverURL}/profile`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(profile),
-        }).then(() => {
+            body: formData,
+        })
+        .then(() => {
             setEditMode(false);
+        })
+        .catch(error => {
+            console.error('Error saving profile:', error);
         });
     }
 
@@ -40,6 +54,10 @@ function ProfilePage() {
             <Card.Body>
                 {editMode ? (
                     <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Profile Photo</Form.Label>
+                            <Form.Control type="file" onChange={handleFileChange} />
+                        </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Name</Form.Label>
                             <Form.Control
