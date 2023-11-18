@@ -59,7 +59,7 @@ function CreateJob() {
     }
 
     return (
-        <Card>
+        <Card className="m-3">
             <Card.Header className="d-flex justify-content-between">
                 <Stack gap={2}>
                     <InputGroup>
@@ -80,7 +80,7 @@ function CreateJob() {
             <Form.Group>
                 <Form.Label>Job Description</Form.Label>
                 <Form.Control value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} as="textarea" rows={3}></Form.Control>
-                <Button variant="secondary" onClick={handleSubmit}>Finish</Button>
+                <Button className="my-2" variant="secondary" onClick={handleSubmit}>Finish</Button>
             </Form.Group>
             {err && <p className="text-danger">{errMsg}</p>}
             </Card.Body>
