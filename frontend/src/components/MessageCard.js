@@ -97,11 +97,13 @@ function MessageCard({message, userInfo, handleChange}) {
                 </div>
                 }
                 {!editing && 
-                    <Card.Text>
-                        {message.messageContents}
-                    </Card.Text>
+                    <div>
+                        <Card.Text>
+                            {message.messageContents}
+                        </Card.Text>
+                        {message.photos.length > 0 && <Card.Img className="msg-img" variant="bottom" src={message.photos[0].url}/>}
+                    </div>
                 }
-            {message.photos.length > 0 && <Card.Img className="msg-img" variant="bottom" src={message.photos[0].url}/>}
             </Card.Body>
         </Card>
     )
