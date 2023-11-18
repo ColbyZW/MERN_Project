@@ -1,11 +1,13 @@
 import React, {useState} from "react";
-import { Card, Stack, Form, Button } from "react-bootstrap";
+import { Card, Stack, Form, Button, InputGroup } from "react-bootstrap";
 import Options from "./Options";
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 function MessageCard({message, userInfo, handleChange}) {
     const [editing, setEditing] = useState(false)
     const [messageContents, setMessageContents] = useState(message.messageContents)
+    const [file, setFile] = useState(null)
+    const [fileKey, setFileKey] = useState(0)
     const [err, setErr] = useState(false)
     const [errMsg, setErrMsg] = useState("")
 
@@ -19,13 +21,16 @@ function MessageCard({message, userInfo, handleChange}) {
             setErrMsg("No blank messages, please")
             return;
         }
-        const payload = {message: messageContents, id: message._id}
+        const formData = new FormData();
+
+        if (file) {
+            formData.append('photo', file);
+        }
+        formData.append('message', messageContents);
+        formData.append('id', message._id);
         fetch(serverURL + '/project/message', {
             method: "PUT",
-            body: JSON.stringify(payload),
-            headers: {
-                "Content-Type": "application/json"
-            }
+            body: formData,
         })
         .then(res => {
             if (res.status !== 200) {
@@ -35,11 +40,11 @@ function MessageCard({message, userInfo, handleChange}) {
             }
             res.json()
         })
-        .then((data) => {
-            if (!data) return;
+        .then(() => {
             setEditing(false)
-            handleChange()
             setErr(false)
+            handleChange()
+            setFileKey(key => key+1);
         })
     }
 
@@ -59,6 +64,12 @@ function MessageCard({message, userInfo, handleChange}) {
         })
     }
 
+    function handleFileChange(event) {
+        if (event.currentTarget.files && event.currentTarget.files[0]) {
+            setFile(event.currentTarget.files[0])
+        }
+    }
+
     return (
         <Card className="my-2">
             <Card.Header className="d-flex justify-content-between">
@@ -76,8 +87,12 @@ function MessageCard({message, userInfo, handleChange}) {
                     <Form.Group>
                         <Form.Label>Write a message</Form.Label>
                         <Form.Control value={messageContents} onChange={handleText} as="textarea" rows={3}></Form.Control>
-                        <Button variant="secondary" onClick={handleSubmit}>Finish</Button>
                     </Form.Group>
+                    <InputGroup className="mb-3 w-50">
+                        <Form.Control key={fileKey} type="file" onChange={handleFileChange} />
+                    </InputGroup>
+
+                    <Button variant="secondary" onClick={handleSubmit}>Finish</Button>
                     {err && <p className="text-danger">{errMsg}</p>}
                 </div>
                 }

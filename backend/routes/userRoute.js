@@ -1,11 +1,13 @@
 import express from 'express';
 export const userRouter = express.Router();
 import { User } from '../models/User.js';
+import { Photo } from '../models/Photo.js';
 import { Lancer } from '../models/Lancer.js';
 import { LancerAccount } from '../models/LancerAccount.js';
 import { Client } from '../models/Client.js';
 import { ClientAccount } from '../models/ClientAccount.js';
 import { authHandler } from '../util.js';
+import { upload } from './testRoute.js';
 
 // Comment this out if you want to test locally with postman
 userRouter.use(authHandler)
@@ -102,6 +104,40 @@ userRouter.get("/", async (req, res) => {
     }
 
     res.status(200).send(user)
+})
+
+userRouter.post("/", upload.single('photo'), async (req, res) => {
+    const {id} = req.session.passport.user;
+    const user = await User.findById(id)
+        .populate('client')
+        .populate('lancer')
+        .populate('photo')
+        .exec();
+    
+
+    if (req.file) {
+        const file = req.file;
+        const photo = new Photo({
+            url: file.location,
+            filename: file.originalname
+        })
+        user.photo = photo;
+        await photo.save()
+    }
+
+    const {name, company} = req.body;
+
+    user.name = name;
+    if (user.client) {
+        user.client.company = company;
+        await user.client.save();
+    } else {
+        user.lancer.company = company;
+        await user.lancer.save();
+    }
+    await user.save();
+
+    res.status(200).send({"message": "Successfully updated profile information"});
 })
 
 userRouter.get('/name', (req, res) => {
