@@ -1,7 +1,6 @@
-.profile-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-}
 
+.profile {
+    width: 7rem;
+    height: 7rem;
+}
 /* Customize further based on your design */

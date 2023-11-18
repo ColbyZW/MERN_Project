@@ -313,12 +313,22 @@ projectRouter.delete('/message/:id', async (req, res) => {
 })
 
 // Route to update a message
-projectRouter.put('/message', async (req, res) => {
+projectRouter.put('/message', upload.single('photo'), async (req, res) => {
     const userId = req.session.passport.user.id;
     const {id, message} = req.body;
     if (!message || !id) {
         res.status(400).send({"message": "Please fill out all fields"});
         return;
+    }
+
+    let photo;
+    if (req.file) {
+        const file = req.file;
+        photo = new Photo({
+            url: file.location,
+            filename: file.originalname
+        })
+        await photo.save()
     }
 
     let msg;
@@ -330,6 +340,7 @@ projectRouter.put('/message', async (req, res) => {
         }
         msg.messageContents = message;
         msg.updatedAt = Date.now()
+        if (photo) msg.photos = [photo]
         await msg.save()
     } catch {
         res.status(400).send({"message": "Invalid messageId"})

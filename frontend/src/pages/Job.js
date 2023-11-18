@@ -11,7 +11,7 @@ function Job() {
     const [userInfo, setUserInfo] = useState()
     const { id } = useParams();
     const [job, setJob] = useState(null)
-    const [file, setFile] = useState(null)
+    const [file, setFile] = useState("")
     const [message, setMessage] = useState("")
     const [fileKey, setFileKey] = useState(0)
     const [err, setErr] = useState(false)
