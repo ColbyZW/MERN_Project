@@ -1,23 +1,60 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Registration.css';
+import { Container } from 'react-bootstrap';
+
+const serverURL = process.env.REACT_APP_SERVER_URL;
 
 function Registration() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [gmail, setGmail] = useState('');
     const [isFreelancer, setIsFreelancer] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [err, setErr] = useState(false);
+    const [errMsg, setErrMsg] = useState("");
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        fetch(serverURL + "/user")
+        .then(res => res.json())
+        .then(data => setGmail(data.email));
+    }, [])
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setErr(false);
+        if (!companyName.trim().length || !firstName.trim().length || !lastName.trim().length) {
+            setErr(true);
+            setErrMsg("Please fill out all fields");
+        }
         if (termsAccepted) {
-
-            //
-            // add actual oauth call to save profile data
-            //
-
-            console.log('Form submitted', { firstName, lastName, isFreelancer });
+            let url = serverURL + "/user";
+            if (isFreelancer) {
+                url = url + "/lancer"
+            } else {
+                url = url + "/client"
+            }
+            let payload = {
+                name: `${firstName} ${lastName}`,
+                company: companyName
+            }
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }).then(res => {
+                if (res.status === 200) {
+                    navigate("/home");
+                }
+            })
         } else {
-            alert('Please accept the terms of service to continue.');
+            setErr(true);
+            setErrMsg("Please accept the Terms of Service");
         }
     };
 
@@ -49,7 +86,11 @@ function Registration() {
 
 
     return (
-        <>
+        <Container fluid className="min-vh-100"
+            style={{
+                backgroundColor: 'var(--peach)',
+            }}
+        >
             <header style={{
                 position: 'absolute',
                 top: 0,
@@ -69,12 +110,9 @@ function Registration() {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '100vh',
-                backgroundColor: 'var(--peach)',
                 padding: '40px'
             }}>
                 <form onSubmit={handleSubmit} style={{
-                    width: '50%',
                     maxWidth: '500px',
                     padding: '40px',
                     borderRadius: '8px',
@@ -86,14 +124,19 @@ function Registration() {
                         padding: '10px',
                         fontSize: '40px'
                     }}>Sign Up</h2>
-                    <div style={{       // placeholder for google oauth reference. like just the gmail address and profile pic
-                        width: '60%',
+                    <div className="my-0 text-center text-decoration-underline">
+                        You are signing up with this email
+                    </div>
+                    <div 
+                        className="w-100 d-flex mx-auto justify-content-center border border-dark mb-3"
+                        style={{       // placeholder for google oauth reference. like just the gmail address and profile pic
                         height: '2em',
                         backgroundColor: 'white',
-                        margin: '20px auto',
                         maxWidth: '300px',
                         textAlign: 'center'
-                    }}>reference to google account</div>
+                    }}>
+                        <p>{gmail}</p>
+                    </div>
                     <div style={{ ...inputContainerStyle }}>
                         <label style={{ ...labelStyle }}>First Name</label>
                         <input
@@ -109,6 +152,15 @@ function Registration() {
                             type="text"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
+                            style={{ ...inputStyle }}
+                        />
+                    </div>
+                    <div style={{ ...inputContainerStyle }}>
+                        <label style={{ ...labelStyle }}>Company Name (N/A if not applicable)</label>
+                        <input
+                            type="text"
+                            value={companyName}
+                            onChange={(e) => setCompanyName(e.target.value)}
                             style={{ ...inputStyle }}
                         />
                     </div>
@@ -141,9 +193,10 @@ function Registration() {
                         backgroundColor: 'var(--dark-mint)',
                         color: 'white'
                     }}>Register</button>
+                    {err && <p className="text-danger">{errMsg}</p>}
                 </form>
             </div>
-        </>
+        </Container>
     );
 }
 

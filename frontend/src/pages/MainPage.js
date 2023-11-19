@@ -13,17 +13,6 @@ function MainPage() {
     window.location.href = "/auth/google"    
   }
 
-  const navigate = useNavigate()
-  useEffect(() => {
-      fetch(serverURL + "/user/isLoggedIn")
-      .then(response => response.json())
-      .then(data => {
-        if (!data.redirect) {
-          navigate("/home")
-        }
-      })
-  }, [navigate])
-
   return (
     <div className="main d-flex flex-column content">
       <Header/>
