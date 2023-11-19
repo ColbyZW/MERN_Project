@@ -26,7 +26,6 @@ userRouter.get('/logout', (req, res) => {
 // Route to create a new Lancer
 userRouter.post('/lancer', async (req, res) => {
     const {company, name} = req.body
-    console.log(company)
     const {id} = req.session.passport.user
     const user = await User.findById(id).exec()
 
