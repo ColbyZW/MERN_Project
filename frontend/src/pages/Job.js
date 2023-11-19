@@ -11,7 +11,7 @@ function Job() {
     const [userInfo, setUserInfo] = useState()
     const { id } = useParams();
     const [job, setJob] = useState(null)
-    const [file, setFile] = useState(null)
+    const [file, setFile] = useState("")
     const [message, setMessage] = useState("")
     const [fileKey, setFileKey] = useState(0)
     const [err, setErr] = useState(false)
@@ -90,7 +90,7 @@ function Job() {
 
     function renderSpinner() {
         return (
-            <Container className="text-center">
+            <Container className="text-center my-5">
                 <Spinner></Spinner>
                 <p>Fetching job info...</p>
             </Container>
@@ -106,7 +106,7 @@ function Job() {
                         <Form.Control value={message} onChange={handleText} as="textarea" rows={3}></Form.Control>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Control key={fileKey} onChange={handleFile} type="file" size="sm"/>
+                        <Form.Control className="w-25" key={fileKey} onChange={handleFile} type="file" size="sm"/>
                     </Form.Group>
                     <Button className="my-1" onClick={handleSubmit} variant="secondary">Submit</Button>
                     {err && <p className="text-danger">{errMsg}</p>}

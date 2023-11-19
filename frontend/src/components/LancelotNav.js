@@ -26,7 +26,7 @@ function LancelotNav() {
     }
     return (
         <div>
-            <Navbar sticky="top" expand="lg" className="bg-body-tertiary">
+            <Navbar sticky="top" expand="lg" className="mb-3" style={{backgroundColor: "var(--peach)"}}>
                 <Container style={{backgroundColor: "var(--peach)"}} fluid>
                     <Navbar.Brand  href="/home">Lancelot</Navbar.Brand>
                     <Navbar.Toggle className="no-focus" aria-controls="basic-navbar-nav" />

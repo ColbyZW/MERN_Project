@@ -7,8 +7,59 @@ import { Message } from '../models/Message.js';
 import { ProjectMessage } from '../models/ProjectMessage.js';
 import { upload } from './testRoute.js';
 import { Photo } from '../models/Photo.js';
-
+import { MongoClient } from 'mongodb';
+const mongoURL = process.env.MONGO_URL
 projectRouter.use(authHandler)
+
+// Route to search existing projects
+projectRouter.get('/search', async (req, res) => {
+    
+    try {
+        const client = new MongoClient(mongoURL);
+        await client.connect();
+        // Get the search term from query parameters
+        const { searchString } = req.query;
+        if (!searchString || !searchString.length) {
+            const projects = await Project.find({}).sort({createdAt: 'desc'}).exec()
+            res.status(200).send(projects);
+            return;
+        }
+        //query default search index
+        const pipeline = [
+            {
+                $search: {
+                    text: {
+                    query: searchString,
+                    path: ["name", "description", "pay"],
+                    fuzzy: {}
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    description: 1,
+                    pay: 1,
+                    createdAt: 1
+                },
+            },   
+        ];
+        
+        //create a cursor pointing to a set of query results
+        const cursor = await client.db("test").collection("projects").aggregate(pipeline);
+        
+        //collect all documents from the cursor and put them into an array
+        let docArray = [];
+        await cursor.forEach((doc) => {docArray.push(doc)});
+        await client.close();
+        res.status(200).send(docArray);
+
+    } catch (error) {
+        res.status(500).send(error.message);
+    } 
+}
+);
 
 // Route to create a new project
 projectRouter.post('/', async (req, res) => {
@@ -62,7 +113,21 @@ projectRouter.post('/', async (req, res) => {
 
 projectRouter.delete("/:projectId", async (req, res) => {
     const {projectId} = req.params;
+    const {id} = req.session.passport.user;
+
+    const user = await User.findById(id).populate('client').exec();
+    if (user === null) {
+        res.status(400).send({"message": "Unable to locate account"});
+        return;
+    }
+
     const project = await Project.findById(projectId).exec();
+
+    if (!user.client || user.client._id.toString() !== project.client._id.toString()) {
+        res.status(400).send({"message": "Cannot delete project you didn't create"});
+        return;
+    }
+
     await ProjectMessage.deleteOne({_id: project.projectMessages._id}).exec()
     await Project.deleteOne({_id: project._id}).exec()
     res.status(200).send({"message": "Successfully deleted project"});
@@ -232,7 +297,13 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
 // Route to delete a message
 projectRouter.delete('/message/:id', async (req, res) => {
     const {id} = req.params
+    const userId = req.session.passport.user.id
     try {
+        const msg = Message.findById(id).exec();
+        if (msg.creator._id.toString() != userId.toString()) {
+            res.status(400).send({"message": "Unable to delete a message you didn't write"})
+            return;
+        }
         await Message.deleteOne({_id: id}).exec()
     } catch {
         res.status(400).send({"message": "Invalid messageId"})
@@ -242,18 +313,34 @@ projectRouter.delete('/message/:id', async (req, res) => {
 })
 
 // Route to update a message
-projectRouter.put('/message', async (req, res) => {
+projectRouter.put('/message', upload.single('photo'), async (req, res) => {
+    const userId = req.session.passport.user.id;
     const {id, message} = req.body;
     if (!message || !id) {
         res.status(400).send({"message": "Please fill out all fields"});
         return;
     }
 
+    let photo;
+    if (req.file) {
+        const file = req.file;
+        photo = new Photo({
+            url: file.location,
+            filename: file.originalname
+        })
+        await photo.save()
+    }
+
     let msg;
     try {
         msg = await Message.findById(id).exec()
+        if (msg.creator._id.toString() != userId.toString()) {
+            res.status(400).send({"message": "Cannot update a message you didn't create"});
+            return;
+        }
         msg.messageContents = message;
         msg.updatedAt = Date.now()
+        if (photo) msg.photos = [photo]
         await msg.save()
     } catch {
         res.status(400).send({"message": "Invalid messageId"})
@@ -332,6 +419,11 @@ projectRouter.patch('/assign', async(req, res) =>{
         return;
     }
 
+    if (!user.lancer) {
+        res.status(400).send({"message": "Not a lancer account"});
+        return;
+    }
+
     const { projectId } = req.body;
     const project = await Project.findById(projectId)
         .populate('name')
@@ -365,6 +457,11 @@ projectRouter.patch('/unassign', async(req, res) =>{
     const user = await User.findById(id).populate('lancer').exec();
     if (user === null) {
         unableToFindAccount(res)
+        return;
+    }
+
+    if (!user.lancer) {
+        res.status(400).send({"message": "Not a lancer account"});
         return;
     }
 
