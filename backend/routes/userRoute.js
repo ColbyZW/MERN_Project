@@ -25,7 +25,8 @@ userRouter.get('/logout', (req, res) => {
 
 // Route to create a new Lancer
 userRouter.post('/lancer', async (req, res) => {
-    const {company} = req.body
+    const {company, name} = req.body
+    console.log(company)
     const {id} = req.session.passport.user
     const user = await User.findById(id).exec()
 
@@ -49,6 +50,7 @@ userRouter.post('/lancer', async (req, res) => {
     await lancerAccount.save()
 
     user.lancer = lancer._id;
+    user.name = name;
     user.fullyRegistered = true;
     await user.save()
 
@@ -58,7 +60,7 @@ userRouter.post('/lancer', async (req, res) => {
 
 // Route to create a new Client
 userRouter.post('/client', async (req, res) => {
-    const {company} = req.body
+    const {company, name} = req.body
     const {id} = req.session.passport.user
     const user = await User.findById(id).exec()
 
@@ -82,6 +84,7 @@ userRouter.post('/client', async (req, res) => {
     await clientAccount.save()
 
     user.client = client._id;
+    user.name = name;
     user.fullyRegistered = true;
     await user.save()
 
