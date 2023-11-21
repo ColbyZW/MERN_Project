@@ -176,6 +176,7 @@ projectRouter.get('/:projectId', async (req, res) => {
         })
         .populate('clientReview')
         .populate('lancerReview')
+        .populate('lancer')
         .exec();
     } catch {
         res.status(400).send({"message": "Inavlid projectId"})
@@ -425,8 +426,8 @@ projectRouter.patch('/assign', async(req, res) =>{
     }
 
     const { projectId } = req.body;
+    console.log(req.body)
     const project = await Project.findById(projectId)
-        .populate('name')
         .populate('lancer')
         .exec();
 

@@ -1,12 +1,13 @@
 import React, {useState} from "react";
 import { Card, Stack, Form, Button, InputGroup } from "react-bootstrap";
 import Options from "./Options";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
 function JobInfoCard({job, userInfo, handleChange}) {
-    let client = userInfo.client ? userInfo.client : {_id: '1'}
+    const client = userInfo.client ? userInfo.client : {_id: '0'}
+    const { id } = useParams();
     const [editing, setEditing] = useState(false)
     const [title, setTitle] = useState(job.title)
     const [pay, setPay] = useState(job.pay)
@@ -14,6 +15,7 @@ function JobInfoCard({job, userInfo, handleChange}) {
     const navigate = useNavigate()
     const [err, setErr] = useState(false)
     const [errMsg, setErrMsg] = useState("")
+    const [alreadyAssigned, setAlreadyAssigned] = useState(false)
 
     function handleTitle(e) {
         setTitle(e.target.value)
@@ -40,6 +42,25 @@ function JobInfoCard({job, userInfo, handleChange}) {
         .then((data) => {
             if (!data) return;
             navigate("/home")
+        })
+    }
+
+    function assignLancer() {
+        const payload = {
+            projectId: id
+        }
+        fetch(serverURL + "/project/assign", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        }).then(res => {
+            if (res.status === 500) {
+                setAlreadyAssigned(true)
+            } else {
+                handleChange()
+            }
         })
     }
 
@@ -94,7 +115,7 @@ function JobInfoCard({job, userInfo, handleChange}) {
                             <InputGroup.Text>Pay</InputGroup.Text>
                             <Form.Control type="text" value={pay} onChange={handlePay}/>
                         </InputGroup>
-                        <h6>Posted By: {job.client.company}</h6>
+                        <h6>Posted By: {job.client && job.client.company}</h6>
                     </Stack>
                     <Stack className="align-items-end">
                         <h6>Start: {new Date(job.startDate).toDateString()}</h6>
@@ -118,13 +139,18 @@ function JobInfoCard({job, userInfo, handleChange}) {
                         <h5>{job.title}</h5>
                         <h6>Pay: {job.pay}</h6>
                         <h6>Posted By: {job.client.company}</h6>
+                        <h6>Currently Assigned to: {job.lancer ? job.lancer.company : "No one!"}</h6>
                     </Stack>
                     <Stack className="align-items-end">
-                        {client._id === job.client._id && 
+                        {client && client._id === job.client._id && 
                             <Options setEdit={setEditing} handleDelete={() => handleDelete()}/>
                         }
                         <h6>Start: {new Date(job.startDate).toDateString()}</h6>
                         <h6>End: {new Date(job.endDate).toDateString()}</h6>
+                        {client && client._id === "0" && 
+                            <Button className="align-self-end" onClick={assignLancer}>Take this job</Button>
+                        }
+                        {alreadyAssigned && <p className="text-danger">This job has already been taken</p>}
                     </Stack>            
                 </Card.Header>
                 <Card.Body>

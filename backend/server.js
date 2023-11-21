@@ -97,7 +97,7 @@ app.use(session({
 app.use(cors({
     credentials: true, 
     origin: baseURL,
-    methods: "GET,POST,PUT,DELETE"
+    methods: "GET,POST,PUT,DELETE,PATCH"
 }))
 app.use(express.json())
 app.use(express.urlencoded())

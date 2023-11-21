@@ -147,6 +147,11 @@ userRouter.get('/name', (req, res) => {
 })
 
 // Utility route to call on every page to ensure user is logged in
-userRouter.get("/isLoggedIn", (req, res) => {
+userRouter.get("/isLoggedIn", async (req, res) => {
+    const {id} = req.session.passport.user;
+    const user = await User.findById(id).exec();
+    if (!user.fullyRegistered) {
+        res.status(400).send({"redirect": "/register"})
+    }
     res.status(200).send({"message": "User logged in"});
 })
