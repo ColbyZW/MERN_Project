@@ -5,6 +5,7 @@
     height: 25vh;
     min-height: 150px;
     width: 100vw;
+    border-bottom: 0.5px solid var(--dark-mint);
 }
 
 

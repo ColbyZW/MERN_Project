@@ -1,6 +1,6 @@
 .footer {
-    min-height: 10vh;
-    min-width: 100vw;
+    min-height: 5vh;
     background-color: var(--peach);
     margin-top: auto;
+    border-top: 0.5px solid var(--dark-mint);
 }

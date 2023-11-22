@@ -3,11 +3,56 @@ body {
   font-family: "Katari-Regular", Helvetica;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f5e8d0;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.card {
+  border: 0.5px solid var(--dark-mint);
+}
+
+.form-control {
+  background-color: var(--peach);
+  border: 0.5px solid var(--dark-mint);
+}
+
+input[type=file]::file-selector-button {
+  background-color: var(--dark-mint);
+  color: white;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: rgba(1, 124, 130, 0.795) !important;
+}
+
+.navbar {
+  border-bottom: 0.5px solid var(--dark-mint);
+}
+
+.form-control:disabled {
+  background-color: rgb(202, 152, 136);
+}
+
+.form-control:focus {
+  background-color: var(--peach)
+}
+
+.input-group-text {
+  background-color: var(--dark-mint);
+  color: white;
+  border: 0.5px solid var(--dark-mint);
+}
+
+.btn {
+  background-color: var(--dark-mint);
+}
+
+.btn:hover {
+  background-color: rgba(1, 124, 130, 0.603);
 }
 
 :root {

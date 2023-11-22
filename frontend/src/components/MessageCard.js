@@ -84,7 +84,7 @@ function MessageCard({message, userInfo, handleChange}) {
             <Card.Body>
                 {editing && 
                 <div>
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Write a message</Form.Label>
                         <Form.Control value={messageContents} onChange={handleText} as="textarea" rows={3}></Form.Control>
                     </Form.Group>

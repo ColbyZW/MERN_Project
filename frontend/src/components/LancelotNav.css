@@ -5,3 +5,7 @@
 .no-focus:hover {
     filter: brightness(75%);
 }
+
+.content {
+    min-height: 100%;
+}

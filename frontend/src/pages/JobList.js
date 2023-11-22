@@ -64,19 +64,21 @@ function JobList() {
     }
 
     return (
-        <Container fluid>
+        <Container fluid className="overflow-auto">
             <div className="w-100">
                 <InputGroup>
                     <InputGroup.Text>Search</InputGroup.Text>
                     <Form.Control value={search} onChange={handleSearch}/>
                 </InputGroup>
             </div>
+            <div className="job-list">
             {
                 loading && renderSpinner()
             }
             {
                 !loading && renderJobs(jobs)
             }
+            </div>
         </Container>
     )
 }

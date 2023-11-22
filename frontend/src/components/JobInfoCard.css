@@ -1,0 +1,8 @@
+.card-header {
+    background-color: var(--peach);
+    border-bottom: 0.5px solid var(--dark-mint);
+}
+
+.card-body {
+    background-color: var(--dark-peach)
+}
