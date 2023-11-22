@@ -175,7 +175,7 @@ userRouter.get("/projects", async (req, res) => {
         // pull all of their projects they've posted
         const clientId = user.client._id;
         for (const project of projects) {
-            if (project.client._id.toString() === clientId.toString()) {
+            if (project.client && project.client._id.toString() === clientId.toString()) {
                 usersProjects.push(project)
             }
         }
@@ -183,7 +183,7 @@ userRouter.get("/projects", async (req, res) => {
         // pull all of the projects they're assigned to
         const lancerId = user.lancer._id;
         for (const project of projects) {
-            if (project.lancer._id.toString() === lancerId.toString()) {
+            if (project.lancer && project.lancer._id.toString() === lancerId.toString()) {
                 usersProjects.push(project)
             }
         }
