@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Card, Form, Button, Container, InputGroup, Spinner, Image, Stack } from 'react-bootstrap';
 import './ProfilePage.css';
 
@@ -12,12 +13,29 @@ function ProfilePage() {
     const [fileKey, setFileKey] = useState(0);
     const [newPhoto, setNewPhoto] = useState(null);
     const [editMode, setEditMode] = useState(false);
+    const [client, setClient] = useState(false);
+    const [jobs, setJobs] = useState([]);
     const [err, setErr] = useState(false);
     const [errMsg, setErrMsg] = useState("");
 
+    const navigate = useNavigate()
+
     useEffect(() => {
         getProfile()
+        getProjects();
     }, []);
+
+    function getProjects() {
+        fetch(`${serverURL}/user/projects`)
+            .then(response => response.json())
+            .then(data => {
+                setJobs(data)
+            })
+    }
+
+    function jobClick(id) {
+        navigate("/home/job/" + id)
+    }
 
     function getProfile() {
         fetch(`${serverURL}/user`)
@@ -27,6 +45,7 @@ function ProfilePage() {
                 setName(data.name)
                 if (data.client) {
                     setCompany(data.client.company)
+                    setClient(true)
                 } else {
                     setCompany(data.lancer.company)
                 }
@@ -84,11 +103,13 @@ function ProfilePage() {
                         <Form>
                             <InputGroup className="mb-3 w-50">
                                 <Stack>
-                                    <InputGroup.Text>Profile Photo</InputGroup.Text>
-                                    <Form.Control key={fileKey} type="file" onChange={handleFileChange} />
+                                    <Form.Group>
+                                        <Form.Label><h5>Profile Picture</h5></Form.Label>
+                                        <Form.Control key={fileKey} type="file" onChange={handleFileChange} />
+                                    </Form.Group>
                                 </Stack>
                             </InputGroup>
-                            <InputGroup className="mb-3">
+                            <InputGroup className="mb-3 w-50">
                                 <InputGroup.Text>Name</InputGroup.Text>
                                 <Form.Control
                                     type="text"
@@ -96,7 +117,7 @@ function ProfilePage() {
                                     onChange={e => setName(e.target.value)}
                                 />
                             </InputGroup>
-                            <InputGroup className="mb-3">
+                            <InputGroup className="mb-3 w-50">
                                 <InputGroup.Text>Email</InputGroup.Text>
                                 <Form.Control
                                     type="email"
@@ -104,7 +125,7 @@ function ProfilePage() {
                                     disabled
                                 />
                             </InputGroup>
-                            <InputGroup className="mb-3">
+                            <InputGroup className="mb-3 w-50">
                                 <InputGroup.Text>Company Name</InputGroup.Text>
                                 <Form.Control
                                     type="text"
@@ -131,6 +152,48 @@ function ProfilePage() {
         )
     }
 
+    function renderJobs() {
+        return (
+            <Container className="mt-4" fluid>
+                <Card>
+                    {client && 
+                    <Card.Body>
+                        <h4>Your Current Job Postings</h4>
+                            {jobs.map((job, i) => (
+                            <Card key={job._id} onClick={() => jobClick(job._id)} className="my-2 job-card">
+                                    <Card.Header className="d-flex justify-content-between">
+                                        <Stack>
+                                            <h5>{job.name}</h5>
+                                            <div>{job.pay}</div>
+                                            <div>Assigned to: {job.lancer ? job.lancer.company : "No one!"}</div>
+                                        </Stack>
+                                        <div>Posted: {new Date(job.createdAt).toDateString()}</div>
+                                    </Card.Header>
+                                </Card>
+                            ))}
+                    </Card.Body>
+                    }
+                    {!client &&
+                    <Card.Body>
+                        <h4>Your Currently Assigned Jobs</h4>
+                            {jobs.map((job, i) => (
+                            <Card key={job._id} onClick={() => jobClick(job._id)} className="my-2 job-card">
+                                    <Card.Header className="d-flex justify-content-between">
+                                        <Stack>
+                                            <h5>{job.name}</h5>
+                                            <div>{job.pay}</div>
+                                        </Stack>
+                                        <div>Posted: {new Date(job.createdAt).toDateString()}</div>
+                                    </Card.Header>
+                                </Card>
+                            ))}
+                    </Card.Body>
+                    }
+                </Card>
+            </Container>
+        )
+    }
+
     function renderSpinner() {
         return (
             <Container className="text-center my-5">
@@ -144,6 +207,7 @@ function ProfilePage() {
         <Container fluid>
             {!profile && renderSpinner()}
             {profile && renderProfileCard()}
+            {profile && jobs && renderJobs()}
         </Container>
     );
 }
