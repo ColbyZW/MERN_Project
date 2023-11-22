@@ -175,7 +175,9 @@ function JobInfoCard({job, userInfo, handleChange}) {
                 </Card.Header>
                 <Card.Body>
                     <Card.Text>
-                        {job.description}
+                        <p style={{whiteSpace: "pre-line"}}>
+                            {job.description}
+                        </p>
                     </Card.Text>
                 </Card.Body>
             </Card>
