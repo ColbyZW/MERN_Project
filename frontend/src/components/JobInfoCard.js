@@ -164,7 +164,7 @@ function JobInfoCard({job, userInfo, handleChange}) {
                         }
                         <h6>Start: {new Date(job.startDate).toDateString()}</h6>
                         <h6>End: {new Date(job.endDate).toDateString()}</h6>
-                        {client._id === "0" && !job.lancer && 
+                        {client && client._id === "0" && !job.lancer && 
                             <Button className="align-self-end" onClick={assignLancer}>Assign Yourself</Button>
                         }
                         {job.lancer && job.lancer._id === lancer._id &&
