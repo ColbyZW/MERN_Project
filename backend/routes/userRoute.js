@@ -1,10 +1,12 @@
 import express from 'express';
+import mongoose from 'mongoose';
 export const userRouter = express.Router();
 import { User } from '../models/User.js';
 import { Photo } from '../models/Photo.js';
 import { Lancer } from '../models/Lancer.js';
 import { LancerAccount } from '../models/LancerAccount.js';
 import { Client } from '../models/Client.js';
+import { Project } from '../models/Project.js';
 import { ClientAccount } from '../models/ClientAccount.js';
 import { authHandler } from '../util.js';
 import { upload } from './testRoute.js';
@@ -154,4 +156,38 @@ userRouter.get("/isLoggedIn", async (req, res) => {
         res.status(400).send({"redirect": "/register"})
     }
     res.status(200).send({"message": "User logged in"});
+})
+
+userRouter.get("/projects", async (req, res) => {
+    const {id} = req.session.passport.user;
+    const user = await User.findById(id)
+        .populate('client')
+        .populate('lancer')
+        .exec();
+
+    const projects = await Project.find({})
+        .populate('client')
+        .populate('lancer')
+        .exec();
+
+    let usersProjects = []
+    if (user.client) {
+        // pull all of their projects they've posted
+        const clientId = user.client._id;
+        for (const project of projects) {
+            if (project.client._id.toString() === clientId.toString()) {
+                usersProjects.push(project)
+            }
+        }
+    } else {
+        // pull all of the projects they're assigned to
+        const lancerId = user.lancer._id;
+        for (const project of projects) {
+            if (project.lancer._id.toString() === lancerId.toString()) {
+                usersProjects.push(project)
+            }
+        }
+    }
+
+    res.status(200).send(usersProjects);
 })
