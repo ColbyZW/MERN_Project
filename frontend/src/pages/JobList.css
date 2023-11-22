@@ -6,3 +6,7 @@
 .job-card {
     cursor: pointer;
 }
+
+.job-list {
+    overflow-y: auto;
+}

@@ -1,10 +1,9 @@
 import './MainPage.css';
-import React, {useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import {Card} from 'react-bootstrap';
 import GoogleButton from '../components/GoogleButton.js'
 import Header from '../components/Header';
-import Footer from '../components/Footer';
+import LancelotFooter from '../components/LancelotFooter.js';
 
 const serverURL = process.env.REACT_APP_SERVER_URL
 
@@ -27,7 +26,7 @@ function MainPage() {
             work. Engage today and enrich your local connections.
           </div>
         </div>
-        <Card className="mx-5 w-75 mw-50 w-sm-50 text-center pt-3 mint shadow-lg">
+        <Card className="mx-5 w-75 mw-50 w-sm-50 text-center dark-peach pt-3 shadow-lg">
           <Card.Body>
             <Card.Title className="mb-3">
               <p className="h4 dark-mint-text">Welcome to Lancelot!</p>
@@ -42,7 +41,7 @@ function MainPage() {
           </Card.Body> 
         </Card>
       </div>
-      <Footer/>
+      <LancelotFooter/>
     </div>
   );
 }

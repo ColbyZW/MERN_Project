@@ -2,11 +2,13 @@ import React, {useState} from "react";
 import { Card, Stack, Form, Button, InputGroup } from "react-bootstrap";
 import Options from "./Options";
 import { useNavigate, useParams } from "react-router-dom";
+import './JobInfoCard.css'
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
 function JobInfoCard({job, userInfo, handleChange}) {
     const client = userInfo.client ? userInfo.client : {_id: '0'}
+    const lancer = userInfo.lancer ? userInfo.lancer : {_id: '0'}
     const { id } = useParams();
     const [editing, setEditing] = useState(false)
     const [title, setTitle] = useState(job.title)
@@ -61,6 +63,21 @@ function JobInfoCard({job, userInfo, handleChange}) {
             } else {
                 handleChange()
             }
+        })
+    }
+
+    function unassignLancer() {
+        const payload = {
+            projectId: id
+        }
+        fetch(serverURL + "/project/unassign", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        }).then(res => {
+            handleChange()
         })
     }
 
@@ -147,8 +164,11 @@ function JobInfoCard({job, userInfo, handleChange}) {
                         }
                         <h6>Start: {new Date(job.startDate).toDateString()}</h6>
                         <h6>End: {new Date(job.endDate).toDateString()}</h6>
-                        {client && client._id === "0" && 
-                            <Button className="align-self-end" onClick={assignLancer}>Take this job</Button>
+                        {client._id === "0" && !job.lancer && 
+                            <Button className="align-self-end" onClick={assignLancer}>Assign Yourself</Button>
+                        }
+                        {job.lancer && job.lancer._id === lancer._id &&
+                            <Button className="align-self-end" onClick={unassignLancer}>Unassign Yourself</Button>
                         }
                         {alreadyAssigned && <p className="text-danger">This job has already been taken</p>}
                     </Stack>            

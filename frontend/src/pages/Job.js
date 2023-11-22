@@ -101,7 +101,7 @@ function Job() {
     return (
             <Card className="mt-3">
                 <Card.Body>
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Write a message</Form.Label>
                         <Form.Control value={message} onChange={handleText} as="textarea" rows={3}></Form.Control>
                     </Form.Group>

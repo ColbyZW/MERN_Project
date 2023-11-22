@@ -16,6 +16,10 @@
     min-height: min-content;
 }
 
+.dark-peach {
+    background-color: var(--dark-peach)
+}
+
 .gray {
     color: #838383;
 }
