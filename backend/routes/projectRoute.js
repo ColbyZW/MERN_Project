@@ -305,9 +305,9 @@ projectRouter.delete('/message/:id', async (req, res) => {
             res.status(400).send({"message": "Unable to delete a message you didn't write"})
             return;
         }
-        await Message.deleteOne({_id: id}).exec()
-    } catch {
-        res.status(400).send({"message": "Invalid messageId"})
+        await Message.deleteOne({_id: msg._id}).exec()
+    } catch (err) {
+        res.status(400).send({"message": err.toString()})
         return;
     }
     return res.status(200).send({"message": "Successfully deleted message"})
