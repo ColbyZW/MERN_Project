@@ -178,8 +178,8 @@ projectRouter.get('/:projectId', async (req, res) => {
         .populate('lancerReview')
         .populate('lancer')
         .exec();
-    } catch {
-        res.status(400).send({"message": "Inavlid projectId"})
+    } catch (err) {
+        res.status(400).send({"message": err.toString()})
         return;
     }
     
@@ -264,8 +264,8 @@ projectRouter.post('/message', upload.single('photo'), async (req, res) => {
     let project;
     try {
         project = await Project.findById(projectId).exec()
-    } catch {
-        res.status(400).send({"message": "Invalid projectId"});
+    } catch (err) {
+        res.status(400).send({"message": err.toString()});
         return;
     }
     const msg = new Message({
@@ -300,9 +300,10 @@ projectRouter.delete('/message/:id', async (req, res) => {
     const {id} = req.params
     const userId = req.session.passport.user.id
     try {
-        const msg = Message.findById(id)
+        const msg = await Message.findById(id)
             .populate('creator')
             .exec();
+
         if (msg.creator._id.toString() != userId.toString()) {
             res.status(400).send({"message": "Unable to delete a message you didn't write"})
             return;
@@ -345,8 +346,8 @@ projectRouter.put('/message', upload.single('photo'), async (req, res) => {
         msg.updatedAt = Date.now()
         if (photo) msg.photos = [photo]
         await msg.save()
-    } catch {
-        res.status(400).send({"message": "Invalid messageId"})
+    } catch (err) {
+        res.status(400).send({"message": err.toString()})
         return;
     }
 
@@ -377,8 +378,8 @@ projectRouter.post('/update', async (req, res) => {
             .populate('clientReview')
             .populate('lancerReview')
             .exec();
-    } catch {
-        res.status(400).send({"message": "Invalid projectId"});
+    } catch (err) {
+        res.status(400).send({"message": err.toString()});
         return;
     }
 
