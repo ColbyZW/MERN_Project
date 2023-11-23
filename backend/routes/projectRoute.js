@@ -300,7 +300,9 @@ projectRouter.delete('/message/:id', async (req, res) => {
     const {id} = req.params
     const userId = req.session.passport.user.id
     try {
-        const msg = Message.findById(id).exec();
+        const msg = Message.findById(id)
+            .populate('creator')
+            .exec();
         if (msg.creator._id.toString() != userId.toString()) {
             res.status(400).send({"message": "Unable to delete a message you didn't write"})
             return;
