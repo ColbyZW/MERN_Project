@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import { Card, Form, Button, Container, InputGroup, Spinner, Image, Stack } from 'react-bootstrap';
 import './ProfilePage.css';
+import { authHandler } from '../util';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
@@ -23,20 +24,15 @@ function ProfilePage() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        fetch(serverURL + "/user/isLoggedIn")
-            .then(response => response.json())
-            .then(data => {
-                if (data.redirect) {
-                    navigate(data.redirect)
-                }
-            })
         getProfile()
         getProjects();
     }, []);
 
     function getProjects() {
         fetch(`${serverURL}/user/projects/${id}`)
-            .then(response => response.json())
+            .then(response => {
+                if (authHandler(response, navigate)) return response.json()
+            })
             .then(data => {
                 setJobs(data)
             })
@@ -48,7 +44,9 @@ function ProfilePage() {
 
     function getProfile() {
         fetch(`${serverURL}/user/${id}`)
-            .then(response => response.json())
+            .then(response => {
+                if (authHandler(response, navigate)) return response.json()
+            })
             .then(data => {
                 setProfile(data)
                 setName(data.name)

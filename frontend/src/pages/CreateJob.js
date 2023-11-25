@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import { Card, Stack, InputGroup, Form, Button, Container, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
+import { authHandler } from "../util";
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
@@ -19,23 +20,16 @@ function CreateJob() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        fetch(serverURL + "/user/isLoggedIn")
-            .then(response => response.json())
-            .then(data => {
-                if (data.redirect) {
-                    navigate(data.redirect)
-                }
-            })
         getUserInfo();
     }, [])
 
     function getUserInfo() {
         fetch(serverURL + "/user")
-        .then(response => response.json())
+        .then(response => {
+            if (authHandler(response, navigate)) return response.json();
+        })
         .then(data => {
-            if (data.status !== 400) {
-                setUserInfo(data)
-            }
+            setUserInfo(data)
         })
     }
 

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import './Job.css'
 import MessageCard from "../components/MessageCard";
 import JobInfoCard from "../components/JobInfoCard";
+import { authHandler } from "../util";
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
@@ -21,6 +22,7 @@ function Job() {
     function getJobInfo() {
         fetch(serverURL + "/project/" + id)
         .then(res => {
+            if (!authHandler(res, navigate)) return
             if (res.status === 400) {
                navigate("/home") 
                return
@@ -34,22 +36,15 @@ function Job() {
 
     function getUserInfo() {
         fetch(serverURL + "/user")
-        .then(response => response.json())
+        .then(response => {
+            if (authHandler(response, navigate)) return response.json();
+        })
         .then(data => {
-            if (data.status !== 400) {
-                setUserInfo(data)
-            }
+            setUserInfo(data)
         })
     }
 
     useEffect(() => {
-        fetch(serverURL + "/user/isLoggedIn")
-            .then(response => response.json())
-            .then(data => {
-                if (data.redirect) {
-                    navigate(data.redirect)
-                }
-            })
         getJobInfo();
         getUserInfo();
     }, [])

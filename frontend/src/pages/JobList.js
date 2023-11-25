@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Container, InputGroup, Spinner, Stack, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "./JobList.css"
+import { authHandler } from "../util";
 
 const serverURL = process.env.REACT_APP_SERVER_URL
 
@@ -13,7 +14,9 @@ function JobList() {
 
     function getJobs() {
         fetch(serverURL + "/project")
-        .then(res => res.json())
+        .then(res => {
+            if (authHandler(res, navigate)) return res.json()
+        })
         .then(data => {
             setJobs(data)
             setLoading(false)
@@ -21,13 +24,6 @@ function JobList() {
     }
 
     useEffect(() => {
-        fetch(serverURL + "/user/isLoggedIn")
-            .then(response => response.json())
-            .then(data => {
-                if (data.redirect) {
-                    navigate(data.redirect)
-                }
-            })
         getJobs()
     }, [])
 

@@ -154,7 +154,8 @@ userRouter.get("/isLoggedIn", async (req, res) => {
     const {id} = req.session.passport.user;
     const user = await User.findById(id).exec();
     if (!user.fullyRegistered) {
-        res.status(400).send({"redirect": "/register"})
+        res.status(403).send({"redirect": "/register"})
+        return;
     }
 
     const userId = user.lancer ? user.lancer._id : user.client._id;
