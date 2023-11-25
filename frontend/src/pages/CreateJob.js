@@ -19,6 +19,13 @@ function CreateJob() {
     const navigate = useNavigate()
 
     useEffect(() => {
+        fetch(serverURL + "/user/isLoggedIn")
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    navigate(data.redirect)
+                }
+            })
         getUserInfo();
     }, [])
 
