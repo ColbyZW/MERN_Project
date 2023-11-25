@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import { Card, Form, Button, Container, InputGroup, Spinner, Image, Stack } from 'react-bootstrap';
 import './ProfilePage.css';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
 function ProfilePage() {
+    const {id} = useParams()
+    const {uid} = useOutletContext()
     const [profile, setProfile] = useState(null);
     const [name, setName] = useState("");
     const [company, setCompany] = useState("");
@@ -26,7 +28,7 @@ function ProfilePage() {
     }, []);
 
     function getProjects() {
-        fetch(`${serverURL}/user/projects`)
+        fetch(`${serverURL}/user/projects/${id}`)
             .then(response => response.json())
             .then(data => {
                 setJobs(data)
@@ -38,7 +40,7 @@ function ProfilePage() {
     }
 
     function getProfile() {
-        fetch(`${serverURL}/user`)
+        fetch(`${serverURL}/user/${id}`)
             .then(response => response.json())
             .then(data => {
                 setProfile(data)
@@ -94,9 +96,11 @@ function ProfilePage() {
             <Card>
                 <Card.Header className="d-flex justify-content-between">
                     <h2>{name}'s Profile</h2>
-                    <Button variant="secondary" onClick={() => setEditMode(!editMode)}>
-                        {editMode ? 'Cancel' : 'Edit'}
-                    </Button>
+                    {uid === profile._id &&
+                        <Button variant="secondary" onClick={() => setEditMode(!editMode)}>
+                            {editMode ? 'Cancel' : 'Edit'}
+                        </Button>
+                    }
                 </Card.Header>
                 <Card.Body>
                     {editMode ? (
@@ -154,11 +158,11 @@ function ProfilePage() {
 
     function renderJobs() {
         return (
-            <Container className="mt-4" fluid>
+            <Container className="my-4" fluid>
                 <Card>
                     {client && 
                     <Card.Body>
-                        <h4>Your Current Job Postings</h4>
+                        <h4>{uid === profile._id ? "Your": name + "'s"} Current Job Postings</h4>
                             {jobs.map((job, i) => (
                             <Card key={job._id} onClick={() => jobClick(job._id)} className="my-2 job-card">
                                     <Card.Header className="d-flex justify-content-between">
@@ -175,7 +179,7 @@ function ProfilePage() {
                     }
                     {!client &&
                     <Card.Body>
-                        <h4>Your Currently Assigned Jobs</h4>
+                        <h4>{uid === profile._id ? "Your": name + "'s"} Currently Assigned Jobs</h4>
                             {jobs.map((job, i) => (
                             <Card key={job._id} onClick={() => jobClick(job._id)} className="my-2 job-card">
                                     <Card.Header className="d-flex justify-content-between">

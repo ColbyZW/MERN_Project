@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { Card, Stack, Form, Button, InputGroup } from "react-bootstrap";
 import Options from "./Options";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import './JobInfoCard.css'
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
@@ -155,8 +155,11 @@ function JobInfoCard({job, userInfo, handleChange}) {
                     <Stack>
                         <h5>{job.title}</h5>
                         <h6>Pay: {job.pay}</h6>
-                        <h6>Posted By: {job.client.company}</h6>
-                        <h6>Currently Assigned to: {job.lancer ? job.lancer.company : "No one!"}</h6>
+                        <h6>Posted By: <Link to={"/home/profile/" + job.client._id}>{job.client.company}</Link></h6>
+                        <h6>
+                            Currently Assigned to: 
+                            {job.lancer ? <Link to={"/home/profile/" + job.lancer._id}>{job.lancer.company}</Link> : "No one!"}
+                        </h6>
                     </Stack>
                     <Stack className="align-items-end">
                         {client && client._id === job.client._id && 

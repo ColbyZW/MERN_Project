@@ -99,7 +99,7 @@ function Job() {
 
     function renderJobMessages(job) {
     return (
-            <Card className="mt-3">
+            <Card className="my-3">
                 <Card.Body>
                     <Form.Group className="mb-3">
                         <Form.Label>Write a message</Form.Label>
