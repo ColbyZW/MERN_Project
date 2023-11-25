@@ -110,6 +110,7 @@ userRouter.get("/", async (req, res) => {
     res.status(200).send(user)
 })
 
+
 userRouter.post("/", upload.single('photo'), async (req, res) => {
     const {id} = req.session.passport.user;
     const user = await User.findById(id)
@@ -155,38 +156,47 @@ userRouter.get("/isLoggedIn", async (req, res) => {
     if (!user.fullyRegistered) {
         res.status(400).send({"redirect": "/register"})
     }
-    res.status(200).send({"message": "User logged in"});
+
+    const userId = user.lancer ? user.lancer._id : user.client._id;
+    res.status(200).send({
+        "message": "User logged in",
+        "id": userId,
+        "uid": user._id
+    });
 })
 
-userRouter.get("/projects", async (req, res) => {
-    const {id} = req.session.passport.user;
-    const user = await User.findById(id)
-        .populate('client')
-        .populate('lancer')
-        .exec();
+// Route to return a specific users information
+userRouter.get("/:id", async (req, res) => {
+    const {id} = req.params;
 
-    const projects = await Project.find({})
-        .populate('client')
-        .populate('lancer')
-        .exec();
-
-    let usersProjects = []
-    if (user.client) {
-        // pull all of their projects they've posted
-        const clientId = user.client._id;
-        for (const project of projects) {
-            if (project.client && project.client._id.toString() === clientId.toString()) {
-                usersProjects.push(project)
-            }
-        }
+    let acc = await Client.findById(id).exec();
+    let user;
+    // handle client flow
+    if (acc) {
+        user = await User.find({ "client": acc}).populate('client').populate('photo').exec();
     } else {
-        // pull all of the projects they're assigned to
-        const lancerId = user.lancer._id;
-        for (const project of projects) {
-            if (project.lancer && project.lancer._id.toString() === lancerId.toString()) {
-                usersProjects.push(project)
-            }
-        }
+        //handle lancer flow
+        acc = await Lancer.findById(id).exec();
+        user = await User.find({ "lancer": acc}).populate('lancer').populate('photo').exec();
+    }
+
+    res.status(200).send(user[0])
+})
+
+userRouter.get("/projects/:id", async (req, res) => {
+    const {id} = req.params;
+    let acc = await Client.findById(id).exec();
+    let user;
+    let usersProjects = [];
+    // handle client flow
+    if (acc) {
+        user = await User.find({ "client": acc }).populate('client').populate('photo').exec();
+        usersProjects = await Project.find({"client": acc}).exec();
+    } else {
+        //handle lancer flow
+        acc = await Lancer.findById(id).exec();
+        user = await User.find({ "lancer": acc }).populate('lancer').populate('photo').exec();
+        usersProjects = await Project.find({"lancer": acc}).exec();
     }
 
     res.status(200).send(usersProjects);

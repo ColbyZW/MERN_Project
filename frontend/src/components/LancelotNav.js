@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import LancelotFooter from "./LancelotFooter";
@@ -8,12 +8,17 @@ const serverURL = process.env.REACT_APP_SERVER_URL
 
 function LancelotNav() {
     const navigate = useNavigate()
+    const [userId, setUserId] = useState("")
+    const [uid, setUID] = useState("")
     useEffect(() => {
         fetch(serverURL + "/user/isLoggedIn")
         .then(response => response.json())
         .then(data => {
           if (data.redirect) {
             navigate(data.redirect)
+          } else {
+            setUserId(data.id)
+            setUID(data.uid)
           }
         })
     }, [navigate])
@@ -35,14 +40,14 @@ function LancelotNav() {
                         <Nav className="me-auto no-focus">
                             <Nav.Link href="/home">Browse Jobs</Nav.Link>
                             <Nav.Link href="/home/newJob">Post a Job</Nav.Link>
-                            <Nav.Link href="/home/profile">Profile</Nav.Link>
+                            <Nav.Link href={"/home/profile/" + userId}>Profile</Nav.Link>
                             <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
             <div>
-                <Outlet/>
+                <Outlet context={{uid}}/>
             </div>
             <LancelotFooter/>
         </div>
