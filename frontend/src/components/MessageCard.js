@@ -99,7 +99,9 @@ function MessageCard({message, userInfo, handleChange}) {
                 {!editing && 
                     <div>
                         <Card.Text>
+                            <p style={{whiteSpace: "pre-line"}}>
                             {message.messageContents}
+                            </p>
                         </Card.Text>
                         {message.photos.length > 0 && <Card.Img className="msg-img" variant="bottom" src={message.photos[0].url}/>}
                     </div>
